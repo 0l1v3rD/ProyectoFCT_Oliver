@@ -6,11 +6,25 @@ header{
 }
 header .bi{
     background-color: gold;
-    margin: 5px;
+    margin: 10px;
     height:30px;
     display:flex;
 }
 header form{
     display: flex;
     margin-left:37%;
+}
+header img{
+    margin-top:5px;
+    margin-bottom:5px;
+}
+/*.dropdown-toggle{
+    margin-bottom:10px;
+}*/
+.categorias_ofc{
+    margin-left:0.75em;
+}
+.card{
+    width: 250px;
+    margin:10px;
 }
