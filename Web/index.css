@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 header{
     display:flex;
     background-color: black;
@@ -27,4 +28,21 @@ header img{
 .card{
     width: 250px;
     margin:10px;
+=======
+header{
+    display:flex;
+    background-color: black;
+    align-items:center;
+    width:100%;
+}
+header .bi{
+    background-color: gold;
+    margin: 5px;
+    height:30px;
+    display:flex;
+}
+header form{
+    display: flex;
+    margin-left:37%;
+>>>>>>> d5dc0a55ca67b088089a97887f279ec52698ae20
 }
