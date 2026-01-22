@@ -1,4 +1,14 @@
-
+<!--<?php
+    
+    if(isset($_SESSION["nombre"]))
+    {
+        $nombre = $_SESSION["nombre"];
+    }
+    else
+    {
+        $nombre = "Anónimo";
+    }
+?>-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,36 +21,43 @@
     <link href="index.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Nunito:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <a title="boton-canvas" class="btn btn-warning bi bi-list" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"></a>
-        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="offcanvasExampleLabel">CWeight</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <div>Categorías</div>
-                <div class="dropdown mt-3">
-                    <p class="categorias_ofc"><a href="./camisetas.html">Camisetas</a></p>
-                    <p class="categorias_ofc"><a href="./pantalones.html">Pantalones</a></p>
-                    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Accesorios</button>
-                    
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Mochilas</a></li>
-                            <li><a class="dropdown-item" href="#">Pesas tobilleras</a></li>
-                            <li><a class="dropdown-item" href="#">Chalecos de peso</a></li>
-                        </ul>
+    <header class="d-flex align-items-center justify-content-between p-3">
+        <a title="Menu Aside" class="btn btn-warning bi bi-list" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"></a>
+        <div class="m-0 w-0">
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+                <div class="offcanvas-header">
+                    <img width="100px" src="img/logo.png" title="Logo">
+                    <h5 class="offcanvas-title" id="offcanvasExampleLabel">CWeight</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div>Categorías</div>
+                    <div class="dropdown mt-3">
+                        <p class="categorias_ofc"><a href="./camisetas.html">Camisetas</a></p>
+                        <p class="categorias_ofc"><a href="./pantalones.html">Pantalones</a></p>
+                        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Accesorios</button>
+                        
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Mochilas</a></li>
+                                <li><a class="dropdown-item" href="#">Pesas tobilleras</a></li>
+                                <li><a class="dropdown-item" href="#">Chalecos de peso</a></li>
+                            </ul>
+                    </div>
                 </div>
             </div>
+            <a href="./index.html"><img width="100px" src="img/logo.png" title="Logo"></a>
         </div>
-        <a href="./index.html"><img width="100px" src="img/logo.png" title="Logo"></a>
-        <form class="form-inline my-2 my-lg-0">
+        <form class="d-flex mx-auto form-inline" style="max-width: 400px;">
             <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0 mx-2" type="submit">Search</button>
         </form>
+        <div class="d-flex align-items-center gap-2">
+            <p class="float-end"><?=$nombre?></p>
+            <img src="<?php if($imagen_usr != ""){echo($imagen_usr);}?>">
+        </div>
     </header>
     <main>
         <div class="container d-flex justify-content-around">
@@ -69,7 +86,7 @@
                                             <div class="card-body d-flex flex-column text-center">
                                                 <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3" 
                                                 title="camiseta" alt="camiseta">
-                                                <p class="card-text">Camiseta negra básica</p>
+                                                <p class="card-text">Cosa 1 negra básica</p>
                                                 <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>
@@ -107,7 +124,7 @@
                                             <div class="card-body d-flex flex-column text-center">
                                                 <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3" 
                                                 title="camiseta" alt="camiseta">
-                                                <p class="card-text">Camiseta negra básica</p>
+                                                <p class="card-text">Panta negra básica</p>
                                                 <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>

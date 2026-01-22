@@ -1,7 +1,12 @@
+*{
+    font-family: "Nunito", sans-serif;
+    font-style: normal;
+}
 a{
     text-decoration: none;
     color:black;
 }
+
 header{
     display:flex;
     background-color: black;
@@ -19,7 +24,7 @@ header .bi:hover{
 }
 header form{
     display: flex;
-    margin-left:37%;
+    margin:0px;
 }
 header img{
     margin-top:5px;
