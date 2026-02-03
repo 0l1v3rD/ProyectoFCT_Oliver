@@ -1,5 +1,4 @@
 <!--<?php
-    
     if(isset($_SESSION["nombre"]))
     {
         $nombre = $_SESSION["nombre"];
@@ -25,7 +24,7 @@
 </head>
 <body>
     <header class="d-flex align-items-center justify-content-between p-3">
-        <a title="Menu Aside" class="btn btn-warning bi bi-list" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"></a>
+        <a title="Menu Aside" class="btn btn-warning bi bi-list" data-bs-toggle="offcanvas" style="padding:20px;" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"></a>
         <div class="m-0 w-0">
             <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
                 <div class="offcanvas-header">
@@ -48,7 +47,7 @@
                     </div>
                 </div>
             </div>
-            <a href="./index.html"><img width="100px" src="img/logo.png" title="Logo"></a>
+            <a href="#"><img width="100px" src="img/logo.png" title="Logo"></a>
         </div>
         <form class="d-flex mx-auto form-inline" style="max-width: 400px;">
             <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -56,13 +55,13 @@
         </form>
         <div class="d-flex align-items-center gap-2">
             <p class="float-end"><?=$nombre?></p>
-            <img src="<?php if($imagen_usr != ""){echo($imagen_usr);}?>">
         </div>
     </header>
     <main>
         <div class="container d-flex justify-content-around">
-                <div id="carouselExampleCaptions" class="carousel carousel-custom w-100 carousel-dark slide">
-                    <h1>Productos</h1>
+                <div id="camisetas" class="carousel carousel-custom w-100 carousel-dark slide">
+                    <hr>
+                    <h1 style="margin-left:15px">Productos</h1>
                     <hr>
                     <div class="carousel-inner">
                         <!--Item por defecto-->
@@ -86,7 +85,7 @@
                                             <div class="card-body d-flex flex-column text-center">
                                                 <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3" 
                                                 title="camiseta" alt="camiseta">
-                                                <p class="card-text">Cosa 1 negra básica</p>
+                                                <p class="card-text">Camiseta negra básica</p>
                                                 <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>
@@ -124,7 +123,7 @@
                                             <div class="card-body d-flex flex-column text-center">
                                                 <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3" 
                                                 title="camiseta" alt="camiseta">
-                                                <p class="card-text">Panta negra básica</p>
+                                                <p class="card-text">Camiseta negra básica</p>
                                                 <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>
@@ -145,11 +144,106 @@
                     </div>
                     <hr>
                     <!-- Controles carousel -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#camisetas" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Anterior</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#camisetas" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                </div>
+            </div>
+            <div class="container d-flex justify-content-around">
+                <div id="pantalones" class="carousel carousel-custom w-100 carousel-dark slide">
+                    <h1 style="margin-left:15px">Pantalones</h1>
+                    <hr>
+                    <div class="carousel-inner">
+                        <!--Item por defecto-->
+                        <div class="carousel-item active">
+                            
+                            <div class="container">
+                                <!-- Conjunto productos-->
+                                <div class="row justify-content-center g-3">
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body d-flex flex-column text-center">
+                                                <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
+                                                title="camiseta" alt="camiseta">
+                                                <p class="card-text">Pantalón negro básico</p>
+                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body d-flex flex-column text-center">
+                                                <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
+                                                title="camiseta" alt="camiseta">
+                                                <p class="card-text">Pantalón negro básico</p>
+                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body d-flex flex-column text-center">
+                                                <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
+                                                title="camiseta" alt="camiseta">
+                                                <p class="card-text">Pantalón negro básico</p>
+                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item carousel-->
+                        <div class="carousel-item">
+                            <div class="container">
+                                <!-- Conjunto productos-->
+                                <div class="row justify-content-center g-3">
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body d-flex flex-column text-center">
+                                                <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
+                                                title="camiseta" alt="camiseta">
+                                                <p class="card-text">Pantalón negro básico</p>
+                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body d-flex flex-column text-center">
+                                                <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
+                                                title="camiseta" alt="camiseta">
+                                                <p class="card-text">Pantalón negro básico</p>
+                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body d-flex flex-column text-center">
+                                                <img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
+                                                title="camiseta" alt="camiseta">
+                                                <p class="card-text">Pantalón negro básico</p>
+                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- Controles carousel -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#pantalones" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#pantalones" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Siguiente</span>
                     </button>
