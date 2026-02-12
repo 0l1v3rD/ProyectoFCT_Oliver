@@ -1,3 +1,21 @@
+<?php
+    include("../Controller/db.inc");
+    session_start();
+    if(isset($_GET["ins"])){
+        $nombre = "Camiseta negra";
+        $color = htmlspecialchars($_POST["color"]);
+        if($fav == true){
+            $fav = "Si";
+        }
+        else{
+            $fav = "No";
+        }
+        $precio = htmlspecialchars($_POST["precio"]);
+        $sql = "INSERT into ";
+    }
+    $_SESSION["carrito"] = array();
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -30,7 +48,7 @@
     <div id="header"></div>
     <main>
         <p class="ms-3 mt-2"><a title="Inicio" href="index.html">Inicio</a> > <a title="Camiseta" href="camiseta.html">Camiseta</a></p>
-        <div id="producto" class="d-flex justify-content-around">
+        <form id="producto" action="camiseta.php?ins=1" class="d-flex justify-content-around">
             <div>
                 <img title="" src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" alt="Camiseta">
             </div>
@@ -50,10 +68,15 @@
                     <p>Almacén más cercano: <b class="text-success">Torrevieja</b></p>
                     <p>Envio: <b class="text-success">Gratis</b></p>
                     <p>Stock: <b class="text-success">5</b></p>
-                    <a href="desarrollo.html"><button class="btn btn-primary" type="button">Añadir al carrito.</button></a>
+                    <a href="desarrollo.html"><button class="btn btn-primary" type="submit">Añadir al carrito.</button></a>
+                    <?php
+                        if(count($_SESSION["carrito"]) == 0 && isset($_SESSION["nombre"])):
+                    ?>
+                    <br><button id="comprar" class="btn btn-warning" type="submit">Comprar.</button>
+                    <?php endif; ?>
                 </div>
             </div>
-        </div>
+        </form>
     </main>
     <div id="footer"></div>
 </body>

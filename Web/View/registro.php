@@ -1,7 +1,74 @@
 <?php
+    session_start();
+    include("../Controller/db.inc");
+    include("../Controller/mail/mail.php");
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\Exception;
     if(isset($_GET["registro"])){
-        session_start();
-        $_SESSION['usuario'] = $_POST['usuario'];
+        $_SESSION['nombre'] = $_POST['nombre'];
+        $nombre = htmlspecialchars($_POST["nombre"]);
+        $email = htmlspecialchars($_POST["email"]);
+        $password = sha1(htmlspecialchars($_POST["password"]));
+
+        $allowedExtensions = ['jpg', 'png'];
+        // Check
+        if(isset($_FILES["f_perf"]) && $_FILES["img_usr"]["error"] == 0){
+            // Tipos de imagen aceptados
+            $allowedExtensions = ['jpg', 'png'];
+            // Tipo de imagen
+            $tipo = strtolower(pathinfo($_FILES["img_usr"]["name"], PATHINFO_EXTENSION));
+            // Si tipo esta aceptado
+            if(in_array($tipo, $allowedExtensions)){
+                // uniqid genera un numero que si o si es unico y lo pongo como nombre de imagen con su tipo al final
+                $nombre_archivo = uniqid('', true) . '.' . $tipo;
+                // Donde voy a mandar la imagen junto a la imagen en si
+                $ruta_destino = '../img/img_usr/' . $nombre_archivo;
+                // Mueve imagen
+                if(move_uploaded_file($_FILES["f_perf"]["tmp_name"], $ruta_destino)){
+                    // Para que los ficheros en View puedan acceder
+                    $imagen_url_completa = "./img/img_usr/" . $nombre_archivo;
+                }
+            }
+        }
+        // Verifico si usuario esta ya en la base de datos
+        $sql = "SELECT * FROM usuarios WHERE email='$email'";
+        $res = mysqli_query($conn, $sql);
+        if(mysqli_num_rows($res) > 0){
+            header("registro.php?error=1");
+        }
+        else{
+            $sql = "INSERT into usuarios(nombre, email, password, imagen_url) VALUES('$nombre', '$email', '$password', '$imagen_url_completa')";
+            if(mysqli_query($conn, $sql)){
+                // Mail
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    // Autenticacion
+                    $mail->SMTPAuth = true;
+                    // El que lo manda
+                    $mail->Username = 'oliveraprietabotones@gmail.com';
+                    // Clave de Gmail del que lo manda (Cuidado!)
+                    $mail->Password = 'vkcd mquk hqwr kact';
+                    // Encriptacion
+                    $mail->SMTPSecure = 'tls';
+                    $mail->Port = 587;
+                    $mail->setFrom('oliveraprietabotones@gmail.com', 'CWeight Company');
+                    // El que lo recibe
+                    $mail->addAddress('oliverdominguezmoreno@gmail.com');
+                    // Titulo del mail
+                    $mail->Subject = 'Registro en C-Weight';
+                    // Contenido
+                    $mail->Body = "Felicidades $nombre, se ha registrado correctamente en la tienda C-Weight, ahora podrá añadir productos al carrito, añadir productos a su lista de deseados y mucho más!!!";
+                    $mail->send();
+                    $mail_code = 0;
+                } catch (Exception $e) {
+                    $mail_code = 1;
+                }
+                header("./inicio_sesion.php");
+            }
+        }
+        
     }
 ?>
 <!DOCTYPE html>
@@ -10,7 +77,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro C-Weight</title>
-    <link rel="icon" type="image/x-icon" href="img/logo.png">
+    <link rel="icon" type="image/x-icon" href="./img/logo.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link href="index.css" rel="stylesheet">
@@ -33,20 +100,23 @@
 </head>
 <body>
     <div id="header"></div>
+    <?php if(isset($_GET["error"])):?>
+        <p>Error.</p>
+    <?php endif; ?>
     <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Registro" href="registro.php">Registro</a></p>
     <main class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column justify-content-center align-items-center w-50">
             <h1 class="text-center m-2">Registro</h1>
-            <form action="registro.php?registro=1" method="post" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
-                <label for="usuario" class="form-label">Usuario</label>
-                <input id="usuario" class="form-control" type="text" label="usuario" name="usuario">
-                <!--<label class="form-label">Apellidos</label>
-                <input id="apellidos" class="form-control" type="text" label="apellidos" name="apellidos">-->
+            <form action="registro.php?registro=1" method="post" enctype="multipart/form-data" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input class="form-control" required type="text" label="nombre" name="nombre">
                 <label for="email" class="form-label">Correo electronico</label>
-                <input id="email" class="form-control" type="text" label="email" name="email">
-                <label for="password" class="form-label">Contraseña</label>
+                <input id="email" required class="form-control" type="text" label="email" name="email">
+                <label for="password" required class="form-label">Contraseña</label>
                 <input id="password" class="form-control" type="password" label="password" name="password">
-                <button type="button" id="registro" class="btn form-control">Registrarse</button>
+                <label for="img">Imagen de usuario:</label>
+                <input id="img_usr" class="form-control" type="file" accept=".jpg, .png" label="img_usr" name="img_usr">
+                <button type="submit" id="registro" class="btn form-control">Registrarse</button>
             </form>
         </div>
         <div class="d-flex d-none d-lg-flex align-items-center justify-content-center w-50">

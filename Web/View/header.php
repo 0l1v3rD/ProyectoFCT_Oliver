@@ -1,13 +1,19 @@
-<!--<?php
+<?php
+    session_start();
+    include("../Controller/db.inc");
     if(isset($_SESSION["nombre"]))
     {
         $nombre = $_SESSION["nombre"];
     }
     else
     {
-        $nombre = "Anónimo";
+        $nombre = "Usuario";
     }
-?>-->
+    $sql = "SELECT imagen_url FROM usuarios WHERE nombre='$nombre'";
+    $res = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($res);
+    $imagen_url = $row['imagen_url'] ?? './img/people.png';
+?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,12 +29,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.js" 
     integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous">
     </script>
-    <!--<script> 
-        $(function(){
-            $("#header").load("header.php"); 
-            $("#footer").load("footer.php"); 
-        });
-    </script>-->
 </head>
 <header class="d-flex align-items-center justify-content-between p-3 w-100">
         <div id="right" class="d-flex flex-row align-items-center">
@@ -38,7 +38,7 @@
                     <div class="offcanvas-header">
                         <img id="logo" width="100px" src="img/logo.png" title="Logo">
                         <h5 class="offcanvas-title" id="titulo">C-Weight</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        <button type="button" class="btn-close bg-danger" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
                         <div>
@@ -59,15 +59,13 @@
                     </div>
                 </div>
         </div>
-        <!--<?php if($_GET['pagina'] != "registro"): ?>-->
-            <form class="d-flex mx-auto form-inline" action="desarrollo.php" style="max-width: 400px;">
-                <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0 mx-2" type="submit">Search</button>
-            </form>
-        <!--<?php endif; ?>-->
+        <form class="d-flex mx-auto form-inline" action="busqueda.php?nombre=<?php if(isset($_POST["prod"])) {echo($_POST["prod"]);} ?>" style="max-width: 400px;">
+            <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="nombre">
+            <button class="btn btn-outline-success my-2 my-sm-0 mx-2" type="submit">Search</button>
+        </form>
         <div class="d-flex align-items-center flex-sm-row justify-content-center gap-2">
             <p id="nombre" class="float-end"><?= $nombre ?></p>
-            <a href="registro.php"><img alt="Registrarse" width="35px" src="img/people.png"></a>
+            <a href="./inicio_sesion.php"><img id="usr_img" alt="Inicio de sesión" width="50px" src="<?php if ($imagen_url != "") { echo($imagen_url); } else { echo("./img/people.png"); } ?>"></a>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     </header>

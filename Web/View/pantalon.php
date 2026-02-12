@@ -1,3 +1,20 @@
+<?php
+    include("../Controller/db.inc");
+    session_start();
+    if(isset($_GET["ins"])){
+        $nombre = "Camiseta negra";
+        $color = htmlspecialchars($_POST["color"]);
+        if($fav == true){
+            $fav = "Si";
+        }
+        else{
+            $fav = "No";
+        }
+        $precio = htmlspecialchars($_POST["precio"]);
+        $sql = "INSERT into ";
+    }
+    $_SESSION["carrito"] = array();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,22 +32,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gravitas+One&family=Nunito:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-    
-    <!--(Ignorar)<script src="https://code.jquery.com/jquery-3.3.1.js" 
+    <script src="https://code.jquery.com/jquery-3.3.1.js" 
     integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous">
-    </script>-->
-    <!--<script>
+    </script>
+    <script>
         $(function(){
             $("#header").load("header.php?pagina=producto"); 
             $("#footer").load("footer.php"); 
         });
-    </script>-->
+        function $carr(){
+
+        }
+    </script>
 </head>
 <body>
-    
+    <div id="header"></div>
     <main>
         <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Inicio" href="pantalon.php">Pantalón</a></p>
-        <div id="producto" class="d-flex justify-content-around">
+        <form id="producto" class="d-flex justify-content-around">
             <div>
                 <img src="img/dsf.png" height="500px" alt="Camiseta">
             </div>
@@ -50,10 +69,15 @@
                     <p>Almacén más cercano: <b class="text-success">Torrevieja</b></p>
                     <p>Envio: <b class="text-success">Gratis</b></p>
                     <p>Stock: <b class="text-success">2</b></p>
-                    <a href="desarrollo.php"><button class="btn btn-primary" type="button">Añadir al carrito.</button></a>
+                    <a href="desarrollo.php"><button class="btn btn-primary" onclick="$carr()" type="submit">Añadir al carrito.</button></a>
+                    <?php
+                        if(count($_SESSION["carrito"]) == 0 && isset($_SESSION["nombre"])):
+                    ?>
+                    <br><button id="comprar" class="btn btn-warning" type="submit">Comprar.</button>
+                    <?php endif; ?>
                 </div>
             </div>
-        </div>
+        </form>
     </main>
     <div id="footer"></div>
 </body>

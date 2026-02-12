@@ -1,6 +1,6 @@
 <?php
     $host = "localhost";  // Servidor
-    $nombreBD = "C-Weight";  // Base de datos
+    $nombreBD = "c-weight";  // Base de datos
     $usuario = "root";  // Usuario
     $password = ""; // Contraseña
 

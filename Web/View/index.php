@@ -1,7 +1,6 @@
-<!--<?php
+<?php
     session_start();
     include("../Controller/db.inc");
-    $sql = "SELECT imagen_url FROM usuarios WHERE nombre='$usuario'";
     if(isset($_SESSION["nombre"]))
     {
         $nombre = $_SESSION["nombre"];
@@ -10,10 +9,7 @@
     {
         $nombre = "Anónimo";
     }
-    $res = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($res);
-    $imagen_url = $row['imagen_url'] ?? './img/admin.jpg';
-?>-->
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -31,7 +27,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gravitas+One&family=Nunito:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-    <!--Stack overflow (Ignorar)-->
+    <!--Stack overflow (Header y Footer)-->
     <script src="https://code.jquery.com/jquery-3.3.1.js" 
     integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous">
     </script>
@@ -44,13 +40,19 @@
 </head>
 <body>
     <div id="header"></div>
-    <!--<div id="header"></div>-->
     <main>
-        <!--<p><?= $_SESSION["usuario"] ?></p>-->
         <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a></p>
         <div class="container d-flex justify-content-around">
                 <div id="camisetas" class="carousel carousel-custom w-100 carousel-dark slide">
                     <hr>
+                    <?php
+                        if(isset($_GET["error"]) && $_GET["error"] == 1):
+                    ?>
+                    <p>Error en el inicio de sesión.</p>
+                    <?php
+                        endif;
+                    ?>
+                    
                     <h1 style="margin-left:15px">Productos</h1>
                     <hr>
                     <div class="carousel-inner">
