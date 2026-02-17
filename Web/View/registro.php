@@ -12,7 +12,7 @@
 
         $allowedExtensions = ['jpg', 'png'];
         // Check
-        if(isset($_FILES["f_perf"]) && $_FILES["img_usr"]["error"] == 0){
+        if(isset($_FILES["img_usr"]) && $_FILES["img_usr"]["error"] == 0){
             // Tipos de imagen aceptados
             $allowedExtensions = ['jpg', 'png'];
             // Tipo de imagen
@@ -24,7 +24,7 @@
                 // Donde voy a mandar la imagen junto a la imagen en si
                 $ruta_destino = '../img/img_usr/' . $nombre_archivo;
                 // Mueve imagen
-                if(move_uploaded_file($_FILES["f_perf"]["tmp_name"], $ruta_destino)){
+                if(move_uploaded_file($_FILES["img_usr"]["tmp_name"], $ruta_destino)){
                     // Para que los ficheros en View puedan acceder
                     $imagen_url_completa = "./img/img_usr/" . $nombre_archivo;
                 }
@@ -100,9 +100,6 @@
 </head>
 <body>
     <div id="header"></div>
-    <?php if(isset($_GET["error"])):?>
-        <p>Error.</p>
-    <?php endif; ?>
     <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Registro" href="registro.php">Registro</a></p>
     <main class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column justify-content-center align-items-center w-50">

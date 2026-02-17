@@ -38,7 +38,7 @@
                     <div class="offcanvas-header">
                         <img id="logo" width="100px" src="img/logo.png" title="Logo">
                         <h5 class="offcanvas-title" id="titulo">C-Weight</h5>
-                        <button type="button" class="btn-close bg-danger" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        <button type="button" class="btn btn-close bg-danger" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
                         <div>
@@ -65,7 +65,15 @@
         </form>
         <div class="d-flex align-items-center flex-sm-row justify-content-center gap-2">
             <p id="nombre" class="float-end"><?= $nombre ?></p>
-            <a href="./inicio_sesion.php"><img id="usr_img" alt="Inicio de sesión" width="50px" src="<?php if ($imagen_url != "") { echo($imagen_url); } else { echo("./img/people.png"); } ?>"></a>
+            <a href="<?php if(isset($_SESSION["nombre"])){ echo("./usuario.php"); } else{ echo("./inicio_sesion.php"); } ?>"><img id="usr_img" alt="Usuario" width="75px" src="<?php if ($imagen_url != "") { echo($imagen_url); } else { echo("./img/people.png"); } ?>"></a>
+            <?php if(isset($_SESSION["nombre"])):?>
+                <div class="carrito">
+                    <a href="<?php if(isset($_SESSION["carrito"])){ echo("./carrito.php"); } else{ echo("./inicio_sesion.php");}?>"><img src="./img/shopping-cart.png" width="55px" alt="Notificaciones"></a>
+                    <?php if(isset($_SESSION["carrito"])): ?>
+                    <span class="cantidad"></span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     </header>

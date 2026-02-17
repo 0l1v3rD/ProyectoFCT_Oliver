@@ -1,3 +1,9 @@
+html{
+    width: 100%;
+}
+
+
+
 *{
     font-family: "Nunito", sans-serif;
     font-style: normal;
@@ -68,6 +74,14 @@ header img{
     filter:brightness(90%);
 }
 
+.bg-danger{
+    transition: 0.2s ease-in;
+}
+
+button.bg-danger:hover{
+    filter:brightness(110%);
+}
+
 .offcanvas{
     color:gold;
     background-image: linear-gradient(to top, yellow, 0.03%, rgb(0, 0, 0));
@@ -114,6 +128,34 @@ header img{
     color: black;
 }
 
+/* Carrito */
+.carrito {
+    position: relative;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.cantidad {
+    /* Posicion (Sensible) */
+    position: absolute;
+    top: 5px;
+    right: -10px;
+    /* Color */
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    /*Tamaño*/
+    width: 20px;
+    height: 20px;
+    /* Centrar numero */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
 /* Borde de formulario */
 
 input.form-control{
@@ -131,6 +173,14 @@ main{
     
     #logo:hover{
         transform: scale(110%);
+    }
+}
+@media (max-width:500px){
+    #logo{
+        display:none;
+    }
+    #nombre{
+        display:none;
     }
 }
 
@@ -214,3 +264,4 @@ footer{
 footer h3{
     font-weight: bold;
 }
+

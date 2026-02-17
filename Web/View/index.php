@@ -1,6 +1,8 @@
 <?php
     session_start();
     include("../Controller/db.inc");
+    // Iterar productos
+    $contador = 0;
     if(isset($_SESSION["nombre"]))
     {
         $nombre = $_SESSION["nombre"];
@@ -9,6 +11,13 @@
     {
         $nombre = "Anónimo";
     }
+    unset($_SESSION["error"]);
+    $sql = "SELECT * FROM productos WHERE encargo=0 AND tipo='Camiseta'";
+    $res = mysqli_query($conn, $sql);
+    $camisetas = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    $sql = "SELECT * FROM productos WHERE encargo=0 AND tipo='Pantalon'";
+    $res = mysqli_query($conn, $sql);
+    $pantalones = mysqli_fetch_all($res, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,90 +54,40 @@
         <div class="container d-flex justify-content-around">
                 <div id="camisetas" class="carousel carousel-custom w-100 carousel-dark slide">
                     <hr>
-                    <?php
-                        if(isset($_GET["error"]) && $_GET["error"] == 1):
-                    ?>
-                    <p>Error en el inicio de sesión.</p>
-                    <?php
-                        endif;
-                    ?>
-                    
                     <h1 style="margin-left:15px">Productos</h1>
                     <hr>
                     <div class="carousel-inner">
-                        <!--Item por defecto-->
+                        <!--Item activo-->
                         <div class="carousel-item active">
                             <div class="container">
                                 <!-- Conjunto productos-->
                                 <div class="row justify-content-center g-3">
+                                <?php foreach ($camisetas as $prod):
+                                    $contador++; ?>
+                                    <!-- Carta para todos los productos de la fila en la que esta el bucle -->
                                     <div class="col-md-4">
                                         <div class="card h-100">
                                             <div class="card-body d-flex flex-column text-center">
-                                                <a href="camiseta.php"><img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
-                                                title="Camiseta" alt="Camiseta"></a>
-                                                <p class="card-text">Camiseta negra básica</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= $prod["img_url"] ?>" class="img-fluid mb-3"
+                                                title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
+                                                <p class="card-text"><?= $prod["nombre"] ?></p>
+                                                <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="camiseta.php"><img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
-                                                title="Camiseta" alt="Camiseta"></a>
-                                                <p class="card-text">Camiseta negra básica</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="camiseta.php"><img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
-                                                title="Camiseta" alt="Camiseta"></a>
-                                                <p class="card-text">Camiseta negra básica</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Cada 3 productos: -->
+                                <?php if($contador == 3): ?>
+                                <!-- Cierro el row actual -->
                                 </div>
                             </div>
                         </div>
-                        <!-- Item carousel-->
-                        <div class="carousel-item">
-                            <div class="container">
-                                <!-- Conjunto productos-->
-                                <div class="row justify-content-center g-3">
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="camiseta.php"><img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
-                                                title="Camiseta" alt="Camiseta"></a>
-                                                <p class="card-text">Camiseta negra básica</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="camiseta.php"><img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
-                                                title="Camiseta" alt="Camiseta"></a>
-                                                <p class="card-text">Camiseta negra básica</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="camiseta.php"><img src="img/isolated_white_and_black_t_shirt_front_view-no-bg.png" class="img-fluid mb-3"
-                                                title="Camiseta" alt="Camiseta"></a>
-                                                <p class="card-text">Camiseta negra básica</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
+<!-- Abro row para otro row -->
+                                <div class="carousel-item">
+                                    <div class="container">
+                                        <!-- Conjunto productos-->
+                                        <div class="row justify-content-center g-3">
+                                <?php endif; ?>
+                                <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
@@ -145,85 +104,43 @@
                     </button>
                 </div>
             </div>
+            
             <div class="container d-flex justify-content-around">
                 <div id="pantalones" class="carousel carousel-custom w-100 carousel-dark slide">
                     <h1 style="margin-left:15px">Pantalones</h1>
                     <hr>
                     <div class="carousel-inner">
-                        <!--Item por defecto-->
+                        <!--Item activo-->
                         <div class="carousel-item active">
-                            
                             <div class="container">
                                 <!-- Conjunto productos-->
                                 <div class="row justify-content-center g-3">
+                                <?php foreach ($pantalones as $prod):
+                                    $contador++; ?>
+                                    <!-- Carta para todos los productos de la fila en la que esta el bucle -->
                                     <div class="col-md-4">
                                         <div class="card h-100">
                                             <div class="card-body d-flex flex-column text-center">
-                                                <a href="pantalon.php"><img src="img/dsf.png" class="img-fluid mb-3"
-                                                title="Pantalón" alt="Pantalón"></a>
-                                                <p class="card-text">Pantalón negro básico</p>
-                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= $prod["img_url"] ?>" class="img-fluid mb-3"
+                                                title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
+                                                <p class="card-text"><?= $prod["nombre"] ?></p>
+                                                <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="pantalon.php"><img src="img/dsf.png" class="img-fluid mb-3"
-                                                title="Pantalón" alt="Pantalón"></a>
-                                                <p class="card-text">Pantalón negro básico</p>
-                                                <a href="#" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="pantalon.php"><img src="img/dsf.png" class="img-fluid mb-3"
-                                                title="Pantalón" alt="Pantalón"></a>
-                                                <p class="card-text">Pantalón negro básico</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Cada 3 productos: -->
+                                <?php if($contador == 3): ?>
+                                <!-- Cierro el row actual -->
                                 </div>
                             </div>
                         </div>
-                        <!-- Item carousel-->
-                        <div class="carousel-item">
-                            <div class="container">
-                                <!-- Conjunto productos-->
-                                <div class="row justify-content-center g-3">
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="pantalon.php"><img src="img/dsf.png" class="img-fluid mb-3"
-                                                title="Pantalón" alt="Pantalón"></a>
-                                                <p class="card-text">Pantalón negro básico</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="pantalon.php"><img src="img/dsf.png" class="img-fluid mb-3"
-                                                title="Pantalón" alt="Pantalón"></a>
-                                                <p class="card-text">Pantalón negro básico</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card h-100">
-                                            <div class="card-body d-flex flex-column text-center">
-                                                <a href="pantalon.php"><img src="img/dsf.png" class="img-fluid mb-3"
-                                                title="Pantalón" alt="Pantalón"></a>
-                                                <p class="card-text">Pantalón negro básico</p>
-                                                <a href="desarrollo.php" class="btn btn-primary mt-auto">Añadir al carrito</a>
-                                            </div>
-                                        </div>
-                                    </div>
+<!-- Abro row para otro row -->
+                                <div class="carousel-item">
+                                    <div class="container">
+                                        <!-- Conjunto productos-->
+                                        <div class="row justify-content-center g-3">
+                                <?php endif; ?>
+                                <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,8 @@
 <?php
     session_start();
+    if(isset($_SESSION["nombre"])){
+        header("location: ./index.php");
+    }
     include("../Controller/db.inc");
     include("../Controller/mail/mail.php");
     use PHPMailer\PHPMailer\PHPMailer;
@@ -10,13 +13,15 @@
         $sql = "SELECT * FROM usuarios WHERE email='$email' AND password='$password'";
         $res = mysqli_query($conn, $sql);
         if(mysqli_num_rows($res) > 0){
+            unset($_SESSION["error"]);
             $usuario = mysqli_fetch_assoc($res);
             $_SESSION["nombre"] = $usuario["nombre"];
             $_SESSION["imagen"] = $usuario["imagen_url"];
             header("Location: ./index.php");
         }
         else{
-            header("Location: ./index.php?error=login");
+            $_SESSION["error"] = "Login";
+            header("Location: ./inicio_sesion.php");
         }
     }
 ?>
@@ -53,11 +58,14 @@
     <main class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column justify-content-center align-items-center w-50">
             <h1 class="text-center m-2">Inicio de sesión</h1>
+            <?php if(isset($_SESSION["error"]) && $_SESSION["error"] == "login"): ?>
+                <p class="text-danger">Error, la contraseña o el email son incorrectos.</p>
+            <?php endif; ?>
             <form action="inicio_sesion.php?inicio=1" method="post" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
                 <label for="email" class="form-label">Correo electronico</label>
-                <input id="email" class="form-control" required type="text" label="email" name="email">
+                <input id="email" class="form-control" placeholder="Email" required type="text" label="email" name="email">
                 <label for="password" class="form-label">Contraseña</label>
-                <input id="password" class="form-control" required type="password" label="password" name="password">
+                <input id="password" class="form-control" placeholder="Contraseña" required type="password" label="password" name="password">
                 <button type="submit" id="inicio" class="btn btn-warning form-control">Iniciar sesión</button>
             </form>
             <p>No tienes cuenta? <a href="./registro.php" class="text-warning">Registrate</a></p>

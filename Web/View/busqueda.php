@@ -1,7 +1,12 @@
 <?php
     session_start();
-    if(isset($_GET["nombre"])){
+    include("../Controller/db.inc");
+    if(isset($_GET["nombre"]) && $_GET["nombre"] != ""){
         $nombre_busq = $_GET["nombre"];
+        $sql = "SELECT * FROM productos WHERE nombre LIKE '%$nombre_busq%'";
+        $res = mysqli_query($conn, $sql);
+        $productos = mysqli_fetch_all($res, MYSQLI_ASSOC);
+        $contador = 0;
     }
     else{
         $nombre_busq = "";
@@ -29,20 +34,50 @@
         <script src="https://code.jquery.com/jquery-3.3.1.js" 
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous">
         </script>
-        <script> 
+        <script>
             $(function(){
-                $("#header").load("header.php"); 
-                $("#footer").load("footer.php"); 
+                $("#header").load("header.php");
+                $("#footer").load("footer.php");
             });
         </script>
     </head>
     <body>
-            <div id="header"></div>
+        <div id="header"></div>
             <p class="ms-3 mt-2"><a href="./index.php">Inicio</a> > <a href="./busqueda.php?nombre='<?php echo $nombre_busq ?>'">Búsqueda</a></p>
             <main>
-                
-
+                <?php  ?>
+                <div class="m-5">
+                    <h1>Resultados de <?php if($nombre_busq == ""){ echo "\"\""; } else{ echo("\"$nombre_busq\""); } ?></h1>
+                    <div class="container d-flex flex-column gap-3 w-100">
+                    <hr>
+                        <div class="row justify-content-around w-100 g-3">
+                                <?php if(isset($_GET["nombre"]) && $nombre_busq != ""):
+                                        foreach ($productos as $prod):
+                                            $contador++; ?>
+                                            <!-- Carta para todos los productos de la fila en la que esta el bucle -->
+                                            <div class="col-md-4">
+                                                <div class="card h-100">
+                                                    <div class="card-body d-flex flex-column text-center">
+                                                        <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= $prod["img_url"] ?>" class="img-fluid mb-3"
+                                                        title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
+                                                        <p class="card-text"><?= $prod["nombre"] ?></p>
+                                                        <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <!-- Cada 3 productos: -->
+                                        <?php if($contador == 3): ?>
+                                        <!-- Cierro el row actual -->
+                                        </div>
+                                        <hr>
+                                        <div class="row justify-content-around w-100 g-3">
+                                        <?php $contador=0; endif; endforeach; 
+                                        else:?>
+                                        <h2 class="text-center">No hay nada en la barra de búsqueda...</h2>
+                                        <?php endif; ?>
+                        </div>
+                </div>
             </main>
-            <div id="footer"></div>
+        <div id="footer"></div>
     </body>
 </html>

@@ -11,9 +11,19 @@
             $fav = "No";
         }
         $precio = htmlspecialchars($_POST["precio"]);
-        $sql = "INSERT into ";
+        // Stack Overflow
+        $sql = "SELECT id FROM pedido_detalles WHERE id=( SELECT max(id) FROM pedido_detalles )";
+        $id = mysqli_query($conn, $sql);
+        $sql = "INSERT into pedidos()";
     }
-    $_SESSION["carrito"] = array();
+    if(!isset($_SESION["carrito"])){
+        $_SESSION["carrito"] = array();
+    }
+    $ultimo = 0;
+    for ($i=0; $i < count($_SESSION["carrito"]); $i++) {
+        $ultimo += 1;
+    }
+    $_SESSION["carrito"][$ultimo] = $id;
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +43,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gravitas+One&family=Nunito:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-
+    <!--Import de header y footer -->
     <script src="https://code.jquery.com/jquery-3.3.1.js" 
     integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous">
     </script>
@@ -68,7 +78,8 @@
                     <p>Almacén más cercano: <b class="text-success">Torrevieja</b></p>
                     <p>Envio: <b class="text-success">Gratis</b></p>
                     <p>Stock: <b class="text-success">5</b></p>
-                    <a href="desarrollo.html"><button class="btn btn-primary" type="submit">Añadir al carrito.</button></a>
+                    <p><?= mysqli_insert_id($conn); ?></p>
+                    <a href="carrito.php"><button class="btn btn-primary" type="button">Añadir al carrito.</button></a>
                     <?php
                         if(count($_SESSION["carrito"]) == 0 && isset($_SESSION["nombre"])):
                     ?>
