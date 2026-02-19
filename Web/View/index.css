@@ -2,8 +2,6 @@ html{
     width: 100%;
 }
 
-
-
 *{
     font-family: "Nunito", sans-serif;
     font-style: normal;
@@ -46,9 +44,34 @@ header img{
     margin-bottom:5px;
 }
 
+/* Usuario */
+
+
+
+/* ??? */
+#desc {
+    position: relative;
+    /* Color */
+    border-radius: 50%;
+    bottom:95px;
+    left:150px;
+    /* Tamaño */
+    width: 100px;
+    height:100px;
+}
+
 /* Nombre de usuario y color del footer (No recomendado pero accesible)*/
 #nombre, footer ul{
     color:gold;
+}
+
+/*Datos de pagina de usuario*/
+#d_usr{
+    min-height: 400px;
+}
+
+#usr{
+    border-radius: 50%;
 }
 
 #usr_img{
@@ -137,16 +160,18 @@ button.bg-danger:hover{
 
 .cantidad {
     /* Posicion (Sensible) */
-    position: absolute;
-    top: 5px;
-    right: -10px;
+    position: relative;
+    /* Color */
+    border-radius: 50%;
+    bottom:58px;
+    left:50px;
+    /* Tamaño */
+    width: 20px;
+    height:20px;
     /* Color */
     background-color: red;
     color: white;
     border-radius: 50%;
-    /*Tamaño*/
-    width: 20px;
-    height: 20px;
     /* Centrar numero */
     display: flex;
     align-items: center;
@@ -160,6 +185,10 @@ button.bg-danger:hover{
 
 input.form-control{
     border:1px solid black;
+}
+
+.upd{
+    border-radius: 5px;
 }
 
 main{
@@ -207,13 +236,19 @@ main{
     transform:scale(115%);
 }
 
-#registro{
+#registro, #registro_pagina{
     transition:0.1s ease-in;
 }
 
 #registro:hover{
     background-color: orange;
 }
+
+#registro_pagina:hover, #inicio:hover{
+    filter:brightness(85%);
+}
+
+
 
 /* Producto */
 
@@ -251,6 +286,8 @@ main{
 #color{
     margin-bottom:10px;
 }
+
+
 
 /* Footer */
 

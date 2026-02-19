@@ -3,6 +3,7 @@
     include("../Controller/db.inc");
     // Iterar productos
     $contador = 0;
+    $error = "";
     if(isset($_SESSION["nombre"]))
     {
         $nombre = $_SESSION["nombre"];
@@ -10,6 +11,9 @@
     else
     {
         $nombre = "Anónimo";
+    }
+    if(isset($_SESSION["error"])){
+        $error = $_SESSION["error"];
     }
     unset($_SESSION["error"]);
     $sql = "SELECT * FROM productos WHERE encargo=0 AND tipo='Camiseta'";
@@ -53,6 +57,9 @@
         <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a></p>
         <div class="container d-flex justify-content-around">
                 <div id="camisetas" class="carousel carousel-custom w-100 carousel-dark slide">
+                    <?php if($error != ""): ?>
+                    <p class="text-center text-danger">Error: <?= $error; ?></p>
+                    <?php endif; ?>
                     <hr>
                     <h1 style="margin-left:15px">Productos</h1>
                     <hr>
@@ -68,7 +75,7 @@
                                     <div class="col-md-4">
                                         <div class="card h-100">
                                             <div class="card-body d-flex flex-column text-center">
-                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= $prod["img_url"] ?>" class="img-fluid mb-3"
+                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
                                                 title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
                                                 <p class="card-text"><?= $prod["nombre"] ?></p>
                                                 <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>
@@ -121,7 +128,7 @@
                                     <div class="col-md-4">
                                         <div class="card h-100">
                                             <div class="card-body d-flex flex-column text-center">
-                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= $prod["img_url"] ?>" class="img-fluid mb-3"
+                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
                                                 title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
                                                 <p class="card-text"><?= $prod["nombre"] ?></p>
                                                 <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>

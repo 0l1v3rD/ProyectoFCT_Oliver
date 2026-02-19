@@ -1,6 +1,6 @@
 <?php
     session_start();
-    if(isset($_SESSION["nombre"])){
+    if(isset($_SESSION["email"])){
         header("location: ./index.php");
     }
     include("../Controller/db.inc");
@@ -13,15 +13,16 @@
         $sql = "SELECT * FROM usuarios WHERE email='$email' AND password='$password'";
         $res = mysqli_query($conn, $sql);
         if(mysqli_num_rows($res) > 0){
-            unset($_SESSION["error"]);
             $usuario = mysqli_fetch_assoc($res);
             $_SESSION["nombre"] = $usuario["nombre"];
+            $_SESSION["email"] = $usuario["email"];
+            $_SESSION["id"] = $usuario["id"];
             $_SESSION["imagen"] = $usuario["imagen_url"];
             header("Location: ./index.php");
         }
         else{
             $_SESSION["error"] = "Login";
-            header("Location: ./inicio_sesion.php");
+            header("Location: ./inicio_sesion.php?email=$email");
         }
     }
 ?>
@@ -54,11 +55,11 @@
 </head>
 <body>
     <div id="header"></div>
-    <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Registro" href="registro.php">Registro</a></p>
+    <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Inicio Sesión" href="inicio_sesion.php">Inicio de sesión</a></p>
     <main class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column justify-content-center align-items-center w-50">
             <h1 class="text-center m-2">Inicio de sesión</h1>
-            <?php if(isset($_SESSION["error"]) && $_SESSION["error"] == "login"): ?>
+            <?php if(isset($_SESSION["error"]) && $_SESSION["error"] == "Login"): ?>
                 <p class="text-danger">Error, la contraseña o el email son incorrectos.</p>
             <?php endif; ?>
             <form action="inicio_sesion.php?inicio=1" method="post" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
@@ -68,7 +69,7 @@
                 <input id="password" class="form-control" placeholder="Contraseña" required type="password" label="password" name="password">
                 <button type="submit" id="inicio" class="btn btn-warning form-control">Iniciar sesión</button>
             </form>
-            <p>No tienes cuenta? <a href="./registro.php" class="text-warning">Registrate</a></p>
+            <p>No tienes cuenta? <a href="./registro.php" id="registro_pagina" class="text-warning">Registrate</a></p>
         </div>
         <div class="d-flex d-none d-lg-flex align-items-center justify-content-center w-50">
             <img alt="Persona levantando peso" width="500px" height="500px" src="img/barbell-black-and-white-black-and-white-791763.jpg">

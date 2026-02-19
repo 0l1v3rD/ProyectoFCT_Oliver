@@ -5,11 +5,17 @@
     use PHPMailer\PHPMailer\PHPMailer;
     use PHPMailer\PHPMailer\Exception;
     if(isset($_GET["registro"])){
-        $_SESSION['nombre'] = $_POST['nombre'];
+        if(isset($_SESSION["email"])){
+            header("index.php");
+        }
         $nombre = htmlspecialchars($_POST["nombre"]);
         $email = htmlspecialchars($_POST["email"]);
         $password = sha1(htmlspecialchars($_POST["password"]));
-
+        $genero = htmlspecialchars($_POST["genero"]);
+        $direccion = htmlspecialchars($_POST["direccion"]);
+        $poblacion = htmlspecialchars($_POST["poblacion"]);
+        $provincia = htmlspecialchars($_POST["provincia"]);
+        $postal = htmlspecialchars($_POST["postal"]);
         $allowedExtensions = ['jpg', 'png'];
         // Check
         if(isset($_FILES["img_usr"]) && $_FILES["img_usr"]["error"] == 0){
@@ -22,7 +28,7 @@
                 // uniqid genera un numero que si o si es unico y lo pongo como nombre de imagen con su tipo al final
                 $nombre_archivo = uniqid('', true) . '.' . $tipo;
                 // Donde voy a mandar la imagen junto a la imagen en si
-                $ruta_destino = '../img/img_usr/' . $nombre_archivo;
+                $ruta_destino = './img/img_usr/' . $nombre_archivo;
                 // Mueve imagen
                 if(move_uploaded_file($_FILES["img_usr"]["tmp_name"], $ruta_destino)){
                     // Para que los ficheros en View puedan acceder
@@ -34,41 +40,59 @@
         $sql = "SELECT * FROM usuarios WHERE email='$email'";
         $res = mysqli_query($conn, $sql);
         if(mysqli_num_rows($res) > 0){
-            header("registro.php?error=1");
+            $_SESSION["error"] = "Usuario";
+            header("registro.php");
         }
         else{
-            $sql = "INSERT into usuarios(nombre, email, password, imagen_url) VALUES('$nombre', '$email', '$password', '$imagen_url_completa')";
-            if(mysqli_query($conn, $sql)){
-                // Mail
-                $mail = new PHPMailer(true);
-                try {
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    // Autenticacion
-                    $mail->SMTPAuth = true;
-                    // El que lo manda
-                    $mail->Username = 'oliveraprietabotones@gmail.com';
-                    // Clave de Gmail del que lo manda (Cuidado!)
-                    $mail->Password = 'vkcd mquk hqwr kact';
-                    // Encriptacion
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
-                    $mail->setFrom('oliveraprietabotones@gmail.com', 'CWeight Company');
-                    // El que lo recibe
-                    $mail->addAddress('oliverdominguezmoreno@gmail.com');
-                    // Titulo del mail
-                    $mail->Subject = 'Registro en C-Weight';
-                    // Contenido
-                    $mail->Body = "Felicidades $nombre, se ha registrado correctamente en la tienda C-Weight, ahora podrá añadir productos al carrito, añadir productos a su lista de deseados y mucho más!!!";
-                    $mail->send();
-                    $mail_code = 0;
-                } catch (Exception $e) {
-                    $mail_code = 1;
-                }
-                header("./inicio_sesion.php");
+            // Verifico si usuario esta ya en la base de datos
+            $sql = "SELECT * FROM clientes WHERE email='$email'";
+            $res = mysqli_query($conn, $sql);
+            if(mysqli_num_rows($res) > 0){
+                $_SESSION["error"] = "Cliente";
+                header("registro.php");
             }
-        }
-        
+            else{
+                # Lo mismo con el cliente
+                $sql = "INSERT into usuarios(nombre, email, password, imagen_url) VALUES('$nombre', '$email', '$password', '$imagen_url_completa')";
+                if(mysqli_query($conn, $sql)){
+                    $sql = "INSERT into clientes(nombre, apellidos, email, genero, direccion, codpostal, poblacion, provincia  password) VALUES('$nombre', '$apellidos', '$email', '$genero', '$direccion', '$codpostal', '$poblacion', '$provincia', '$password')";
+                    if(mysqli_num_rows($res) > 0){
+                        header("registro.php");
+                    }
+                    else{
+                        if(mysqli_query($conn, $sql)){
+                            // Mail
+                            $mail = new PHPMailer(true);
+                            try {
+                                $mail->isSMTP();
+                                $mail->Host = 'smtp.gmail.com';
+                                // Autenticacion
+                                $mail->SMTPAuth = true;
+                                // El que lo manda
+                                $mail->Username = 'oliveraprietabotones@gmail.com';
+                                // Clave de Gmail del que lo manda (Cuidado!)
+                                $mail->Password = 'vkcd mquk hqwr kact';
+                                // Encriptacion
+                                $mail->SMTPSecure = 'tls';
+                                $mail->Port = 587;
+                                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                                // El que lo recibe
+                                $mail->addAddress('$_POST["email"]');
+                                // Titulo del mail
+                                $mail->Subject = 'Registro en C-Weight';
+                                // Contenido
+                                $mail->Body = "Felicidades $nombre, se ha registrado correctamente en la tienda C-Weight, ahora podrá añadir productos al carrito, añadir productos a su lista de deseados y mucho más!!!";
+                                $mail->send();
+                                $mail_code = 0;
+                            } catch (Exception $e) {
+                                $mail_code = 1;
+                            }
+                        }
+                    }
+                    header("./inicio_sesion.php");
+                }
+            }
+        } 
     }
 ?>
 <!DOCTYPE html>
@@ -104,14 +128,37 @@
     <main class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column justify-content-center align-items-center w-50">
             <h1 class="text-center m-2">Registro</h1>
+            <?php if($_SESSION["error"] == "Cliente"): ?>
+                <h2 class="text-danger">Error, ya hay un cliente con ese email.</h2>
+            <?php endif; ?>
+            <?php if($_SESSION["error"] == "Usuario"): ?>
+                <h2 class="text-danger">Error, ya hay un usuario con ese email.</h2>
+            <?php endif; ?>
             <form action="registro.php?registro=1" method="post" enctype="multipart/form-data" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
                 <label for="nombre" class="form-label">Nombre</label>
-                <input class="form-control" required type="text" label="nombre" name="nombre">
-                <label for="email" class="form-label">Correo electronico</label>
-                <input id="email" required class="form-control" type="text" label="email" name="email">
+                <input class="form-control" required type="text" label="nombre" name="nombre" maxlength="50">
+                <label for="nombre" class="form-label">Apellidos</label>
+                <input class="form-control" required type="text" label="apellidos" name="apellidos" maxlength="75">
+                <p class="form-label">Género</p>
+                <div class="">
+                    <input id="M" type="radio" name="genero" value="M"> <label class="form-label" for="M">Mujer</label><br>
+                    <input id="H" type="radio" name="genero" value="H"> <label class="form-label" for="H">Hombre</label><br>
+                </div>
+                <label for="email" class="form-label">Dirección</label>
+                <input id="direccion" required class="form-control" type="text" label="direccion" name="direccion" maxlength="100">
+                <label for="poblacion" class="form-label">Población</label>
+                <input id="poblacion" required class="form-control" type="text" label="poblacion" name="poblacion" maxlength="100">
+                <label for="provincia" class="form-label">Provincia</label>
+                <input id="provincia" required class="form-control" type="text" label="provincia" name="provincia" maxlength="100">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input id="direccion" required class="form-control" type="text" label="direccion" name="direccion" maxlength="100">
+                <label for="postal" class="form-label">Cod. Postal</label>
+                <input id="postal" required class="form-control" type="number" label="postal" name="postal" maxlength="5">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input id="email" required class="form-control" type="text" label="email" name="email" maxlength="50">
                 <label for="password" required class="form-label">Contraseña</label>
                 <input id="password" class="form-control" type="password" label="password" name="password">
-                <label for="img">Imagen de usuario:</label>
+                <label for="img">Imágen de usuario:</label>
                 <input id="img_usr" class="form-control" type="file" accept=".jpg, .png" label="img_usr" name="img_usr">
                 <button type="submit" id="registro" class="btn form-control">Registrarse</button>
             </form>

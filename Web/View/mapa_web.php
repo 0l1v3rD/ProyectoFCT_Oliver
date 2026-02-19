@@ -31,8 +31,6 @@
     <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Mapa Web" href="mapa_web.php">Mapa Web</a></p>
     <main class="d-flex flex-column text-center m-2">
         <p><a href="index.php">Inicio</a></p>
-        <p><a href="camiseta.php">Camiseta</a></p>
-        <p><a href="pantalon.php">Pantalón</a></p>
         <p><a href="registro.php">Registro</a></p>
         <p><a href="mapa_web.php">Mapa Web</a></p>
     </main>

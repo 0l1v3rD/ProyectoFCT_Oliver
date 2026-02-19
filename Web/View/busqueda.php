@@ -1,6 +1,7 @@
 <?php
     session_start();
     include("../Controller/db.inc");
+    $error = "";
     if(isset($_GET["nombre"]) && $_GET["nombre"] != ""){
         $nombre_busq = $_GET["nombre"];
         $sql = "SELECT * FROM productos WHERE nombre LIKE '%$nombre_busq%'";

@@ -1,18 +1,30 @@
 <?php
     session_start();
     include("../Controller/db.inc");
-    if(isset($_SESSION["nombre"]))
+    $_SESSION["error"] = "";
+    if(isset($_SESSION["email"]))
     {
-        $nombre = $_SESSION["nombre"];
+        $email = $_SESSION["email"];
+        $sql = "SELECT id, nombre, email, imagen_url FROM usuarios WHERE email='$email'";
+        $res = mysqli_query($conn, $sql);
+        $row = mysqli_fetch_assoc($res);
+        $nombre = $row["nombre"];
+        $id = $row["id"];
+        $email = $row["email"];
+        $imagen_url = $row["imagen_url"] ?? "./img/people.png";
+        $_SESSION["nombre"] = $nombre;
+        $_SESSION["id"] = $id;
+        $_SESSION["email"] = $email;
+        $_SESSION["imagen"] = $imagen_url;
+        if(!isset($_SESSION["carrito"])){
+            $_SESSION["carrito"] = array();
+        }
     }
     else
     {
         $nombre = "Usuario";
     }
-    $sql = "SELECT imagen_url FROM usuarios WHERE nombre='$nombre'";
-    $res = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($res);
-    $imagen_url = $row['imagen_url'] ?? './img/people.png';
+    $imagen_url = $row["imagen_url"] ?? "./img/people.png";
 ?>
 <head>
     <meta charset="UTF-8">
@@ -47,8 +59,8 @@
                         </div>
                         <div>Categorías</div>
                         <div class="dropdown mt-3">
-                            <p class="categorias_ofc"><a href="./camiseta.php">Camisetas</a></p>
-                            <p class="categorias_ofc"><a href="./pantalon.php">Pantalones</a></p>
+                            <p class="categorias_ofc"><a href="desarrollo.php">Camisetas</a></p>
+                            <p class="categorias_ofc"><a href="desarrollo.php">Pantalones</a></p>
                             <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Accesorios</button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="desarrollo.php">Mochilas</a></li>
@@ -69,7 +81,7 @@
             <?php if(isset($_SESSION["nombre"])):?>
                 <div class="carrito">
                     <a href="<?php if(isset($_SESSION["carrito"])){ echo("./carrito.php"); } else{ echo("./inicio_sesion.php");}?>"><img src="./img/shopping-cart.png" width="55px" alt="Notificaciones"></a>
-                    <?php if(isset($_SESSION["carrito"])): ?>
+                    <?php if(isset($_SESSION["carrito"]) && count($_SESSION["carrito"]) > 0):?>
                     <span class="cantidad"></span>
                     <?php endif; ?>
                 </div>
