@@ -1,5 +1,10 @@
 <?php
-    
+    include("../Controller/db.inc");
+    $carrito = array();
+    $contador = 0;
+    if(isset($_GET["id"])){
+        $_SESSION["carrito"][] = $_GET["id"];
+    }
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -32,14 +37,33 @@
 <body>
     <div id="header"></div>
     <main>
-        <p class="ms-3 mt-2"><a title="Inicio" href="index.html">Inicio</a> > <a title="Camiseta" href="camiseta.html">Camiseta</a></p>
+        <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Camiseta" href="carrito.php">Carrito</a></p>
         <div class="m-3">
             <?php
-                
+            if(isset($_GET["id"])){
+                foreach ($_SESSION["carrito"] as $id) {
+                    $sql = "SELECT * FROM productos WHERE id='$id'";
+                    $res = mysqli_query($conn, $sql);
+                    $carrito[] = $res;
+                }
+            }
             ?>
             <h1>Carrito:</h1>
-            <div class="border border-1">
-                <p>Hola</p>
+            <div class="container border border-1 d-flex">
+                <div class="container row col-md-4">
+                    <?php foreach($carrito as $prod): 
+                        $contador++;
+                    ?>
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column text-center">
+                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
+                                title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
+                                <p class="card-text"><?= $prod["nombre"] ?></p>
+                            </div>
+                        </div>            
+
+                </div>
+                    <?php endforeach; ?>
             </div>
         </div>
     </main>

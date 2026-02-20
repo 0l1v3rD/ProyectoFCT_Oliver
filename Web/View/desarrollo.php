@@ -38,7 +38,7 @@
 <body>
     <div id="header"></div>
     <main>
-        <p class="ms-3 mt-2"><a title="Inicio" href="index.html">Inicio</a> > <a title="Inicio" href="index.html">Desarrollo</a></p>
+        <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Inicio" href="desarrollo.php">Desarrollo</a></p>
         <div class="container d-flex flex-column text-center justify-content-around">
             <h1>En desarrollo...</h1>
             <h2>Ahora mismo no tenemos la infraestructura para el link al que has accedido.</h2>

@@ -10,9 +10,6 @@
         $id_cliente = $_SESSION["id"];
         $fecha_hoy = date_default_timezone_get();
         $fecha_esp = date('Y-m-d', strtotime("+15 days"));
-        $sql = "SELECT * FROM productos WHERE id='$id_producto'";
-        $res = mysqli_query($conn, $sql);
-        $producto = mysqli_fetch_assoc($res);
         if(isset($_GET["ins"])){
             $nombre = $producto["nombre"];
             $precio = $producto["precio_unidad"];
@@ -75,7 +72,7 @@
 <body>
     <div id="header"></div>
     <main>
-        <p class="ms-3 mt-2"><a title="Inicio" href="index.html">Inicio</a> > <a title="Camiseta" href="camiseta.html">Camiseta</a></p>
+        <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="<?= $nombre ?>" href="producto.php?id=<?= $id_producto ?>">Camiseta</a></p>
         <form id="producto" action="comprar.php" class="d-flex justify-content-around">
             <div>
                 <img title="<?= $producto["nombre"] ?>" src="<?php if ($producto["img_url"] != "") { echo($producto["img_url"]); } else { echo("./img/broken-image.png"); } ?>" alt="Camiseta">

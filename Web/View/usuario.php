@@ -87,7 +87,7 @@
     <main class="d-flex flex-lg-row flex-column justify-content-center">
         <div class="d-flex flex-column justify-content-center align-items-center w-100">
             <img id="usr" src="<?php if($_SESSION["imagen"] != ""){ echo($_SESSION["imagen"]); } else{ echo("./img/people.png"); } ?>" width="400px" height="400px">
-            <a href="./desc.php"><img id="desc" src="./img/8917901.png"></a>
+            <a href="../Controller/desc.php"><img id="desc" src="./img/8917901.png"></a>
         </div>
         <div id="d_usr" class="d-flex flex-column d-md-flex align-items-center justify-content-center border border-2 w-100 h3">
             <p id="nombre_usr">Nombre: <?= $_SESSION["nombre"] ?></p>
