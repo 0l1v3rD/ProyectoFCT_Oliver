@@ -204,7 +204,7 @@ main{
         transform: scale(110%);
     }
 }
-@media (max-width:500px){
+@media (max-width:600px){
     #logo{
         display:none;
     }
@@ -223,7 +223,7 @@ main{
     }
 }
 
-#logoCanv, #logo{
+#logo_as, #logo{
     border-radius: 10px;
     margin-right:5px;
 }

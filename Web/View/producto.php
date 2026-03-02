@@ -7,31 +7,20 @@
         $res = mysqli_query($conn, $sql);
         $producto = mysqli_fetch_assoc($res);
         $precio = $producto["precio_unidad"];
-        $id_cliente = $_SESSION["id"];
-        $fecha_hoy = date_default_timezone_get();
-        $fecha_esp = date('Y-m-d', strtotime("+15 days"));
-        if(isset($_GET["ins"])){
-            $nombre = $producto["nombre"];
-            $precio = $producto["precio_unidad"];
-            // Stack Overflow
-            $sql = "SELECT id FROM pedido_detalles WHERE id=( SELECT max(id) FROM pedido_detalles )";
-            $id = mysqli_query($conn, $sql) + 1;
-            $sql = "INSERT into pedidos(id_cliente, id_detalles, fecha_inicio, fecha_final, estado) VALUES('$id_cliente', '$id', '$fecha_hoy', '$fecha_esp', 'Pendiente')";
-            $res = mysqli_query($conn, $sql);
-            if(mysqli_affected_rows($conn) > 0){
-                $sql = "SELECT id FROM pedidos WHERE id=( SELECT max(id) FROM pedidos )";
-                $id = mysqli_query($conn, $sql);
-                $sql = "INSERT into pedido_detalles(id_pedido, id_producto, cantidad, precio_total) VALUES('$id', '$id_producto', 1, '$precio')";
-            $res = mysqli_query($conn, $sql);
-            }
+        if(isset($_SESSION["id"])){
+            $id_cliente = $_SESSION["id"];
         }
-        
+        $fecha_hoy = date_create();
+        $fecha_esp = date_add($fecha_hoy, date_interval_create_from_date_string("40 days"));
+        if(isset($_GET["ins"]) && isset($_GET["id"]) && isset($_GET["cantidad"])){
+            $_SESSION["carrito"][] = [
+                "id"=> $_GET["id"],
+                "cantidad"=> $_GET["cantidad"]
+            ];
+            header("Location: pedido.php");
+        }
         if(!isset($_SESION["carrito"])){
             $_SESSION["carrito"] = array();
-        }
-        $ultimo = 0;
-        for ($i=0; $i < count($_SESSION["carrito"]); $i++) {
-            $ultimo += 1;
         }
     }
     else{
@@ -67,13 +56,14 @@
             $("#header").load("header.php"); 
             $("#footer").load("footer.php"); 
         });
+
     </script>
 </head>
 <body>
     <div id="header"></div>
     <main>
         <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="<?= $nombre ?>" href="producto.php?id=<?= $id_producto ?>">Camiseta</a></p>
-        <form id="producto" action="comprar.php" class="d-flex justify-content-around">
+        <form id="producto" action="producto.php?id=<?php $id = $_GET["id"]; ?>?ins=1" class="d-flex justify-content-around">
             <div>
                 <img title="<?= $producto["nombre"] ?>" src="<?php if ($producto["img_url"] != "") { echo($producto["img_url"]); } else { echo("./img/broken-image.png"); } ?>" alt="Camiseta">
             </div>
@@ -93,7 +83,7 @@
                     <p>Almacén más cercano: <b class="text-success">Torrevieja</b></p>
                     <p>Envio: <b class="text-success">Gratis</b></p>
                     <p>Stock: <b class="text-success">5</b></p>
-                    <a href="carrito.php?id=<?= $producto["id"] ?>"><button class="btn btn-primary" type="button">Añadir al carrito.</button></a>
+                    <a href="<?php if(isset($_SESSION["id"])){ echo("carrito.php?id=" . $producto['id']) . "&cantidad=1"; } else{ echo("inicio_sesion.php"); } ?>"><button class="btn btn-primary" type="button">Añadir al carrito.</button></a>
                     <?php if(count($_SESSION["carrito"]) == 0 && isset($_SESSION["email"])): ?>
                         <br><a><button id="comprar" class="btn btn-warning" type="submit">Comprar.</button></a>
                     <?php endif; ?>

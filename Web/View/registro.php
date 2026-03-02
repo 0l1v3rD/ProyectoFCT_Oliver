@@ -9,6 +9,7 @@
             header("index.php");
         }
         $nombre = htmlspecialchars($_POST["nombre"]);
+        $apellidos = htmlspecialchars($_POST["apellidos"]);
         $email = htmlspecialchars($_POST["email"]);
         $password = sha1(htmlspecialchars($_POST["password"]));
         $genero = htmlspecialchars($_POST["genero"]);
@@ -44,7 +45,7 @@
             header("registro.php");
         }
         else{
-            // Verifico si usuario esta ya en la base de datos
+            # Lo mismo con el cliente
             $sql = "SELECT * FROM clientes WHERE email='$email'";
             $res = mysqli_query($conn, $sql);
             if(mysqli_num_rows($res) > 0){
@@ -52,44 +53,51 @@
                 header("registro.php");
             }
             else{
-                # Lo mismo con el cliente
+                #Inserto usuario
                 $sql = "INSERT into usuarios(nombre, email, password, imagen_url) VALUES('$nombre', '$email', '$password', '$imagen_url_completa')";
-                if(mysqli_query($conn, $sql)){
-                    $sql = "INSERT into clientes(nombre, apellidos, email, genero, direccion, codpostal, poblacion, provincia  password) VALUES('$nombre', '$apellidos', '$email', '$genero', '$direccion', '$codpostal', '$poblacion', '$provincia', '$password')";
-                    if(mysqli_num_rows($res) > 0){
-                        header("registro.php");
+                mysqli_query($conn, $sql);
+                if(mysqli_affected_rows($conn) > 0){
+                    $id_usuario = $_SESSION["id"];
+                    #Inserto cliente
+                    $sql = "INSERT into clientes(id_usuario, nombre, apellidos, email, genero, direccion, codpostal, poblacion, provincia, password) VALUES($id_usuario, '$nombre', '$apellidos', '$email', '$genero', '$direccion', '$postal', '$poblacion', '$provincia', '$password')";
+                    mysqli_query($conn, $sql);
+                    if(mysqli_affected_rows($conn) > 0){
+                        // Mail
+                        $mail = new PHPMailer(true);
+                        try {
+                            $mail->isSMTP();
+                            $mail->Host = 'smtp.gmail.com';
+                            // Autenticacion
+                            $mail->SMTPAuth = true;
+                            // El que lo manda
+                            $mail->Username = 'oliveraprietabotones@gmail.com';
+                            // Clave de Gmail del que lo manda (Cuidado!)
+                            $mail->Password = 'vkcd mquk hqwr kact';
+                            // Encriptacion
+                            $mail->SMTPSecure = 'tls';
+                            $mail->Port = 587;
+                            $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                            // El que lo recibe
+                            $mail->addAddress($_POST["email"]);
+                            // Titulo del mail
+                            $mail->Subject = 'Registro en C-Weight';
+                            // Contenido
+                            $mail->Body = "Felicidades $nombre, se ha registrado correctamente en la tienda C-Weight, ahora podrá añadir productos al carrito, añadir productos a su lista de deseados y mucho más!!!";
+                            $mail->send();
+                        }
+                        catch (Exception $e) {
+                            $_SESSION["error"] = "Error correo automático";
+                        }
+                        header("inicio_sesion.php");
                     }
                     else{
-                        if(mysqli_query($conn, $sql)){
-                            // Mail
-                            $mail = new PHPMailer(true);
-                            try {
-                                $mail->isSMTP();
-                                $mail->Host = 'smtp.gmail.com';
-                                // Autenticacion
-                                $mail->SMTPAuth = true;
-                                // El que lo manda
-                                $mail->Username = 'oliveraprietabotones@gmail.com';
-                                // Clave de Gmail del que lo manda (Cuidado!)
-                                $mail->Password = 'vkcd mquk hqwr kact';
-                                // Encriptacion
-                                $mail->SMTPSecure = 'tls';
-                                $mail->Port = 587;
-                                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
-                                // El que lo recibe
-                                $mail->addAddress('$_POST["email"]');
-                                // Titulo del mail
-                                $mail->Subject = 'Registro en C-Weight';
-                                // Contenido
-                                $mail->Body = "Felicidades $nombre, se ha registrado correctamente en la tienda C-Weight, ahora podrá añadir productos al carrito, añadir productos a su lista de deseados y mucho más!!!";
-                                $mail->send();
-                                $mail_code = 0;
-                            } catch (Exception $e) {
-                                $mail_code = 1;
-                            }
-                        }
+                        $_SESSION["error"] = "Cliente Ins";
+                        header("registro.php");
                     }
-                    header("./inicio_sesion.php");
+                }
+                else{
+                    $_SESSION["error"] = "Usuario Ins";
+                    header("registro.php");
                 }
             }
         } 
@@ -133,6 +141,12 @@
             <?php endif; ?>
             <?php if($_SESSION["error"] == "Usuario"): ?>
                 <h2 class="text-danger">Error, ya hay un usuario con ese email.</h2>
+            <?php endif; ?>
+            <?php if($_SESSION["error"] == "Cliente Ins"): ?>
+                <h2 class="text-danger">Error, ha habido un problema con la inserción de su cliente, si tiene problemas, por favor contacte con el equipo de soporte.</h2>
+            <?php endif; ?>
+            <?php if($_SESSION["error"] == "Usuario Ins"): ?>
+                <h2 class="text-danger">Error, ha habido un problema con la inserción de su usuario, si tiene problemas, por favor contacte con el equipo de soporte.</h2>
             <?php endif; ?>
             <form action="registro.php?registro=1" method="post" enctype="multipart/form-data" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
                 <label for="nombre" class="form-label">Nombre</label>

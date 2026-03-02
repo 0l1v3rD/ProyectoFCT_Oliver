@@ -78,7 +78,7 @@
                                                 <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
                                                 title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
                                                 <p class="card-text"><?= $prod["nombre"] ?></p>
-                                                <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                                <a href="carrito.php?id=<?= $prod["id"] ?>&cantidad=1" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>
                                     </div>
@@ -131,7 +131,7 @@
                                                 <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
                                                 title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
                                                 <p class="card-text"><?= $prod["nombre"] ?></p>
-                                                <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>
+                                                <a href="carrito.php?id=<?= $prod["id"] ?>&cantidad=1" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
                                         </div>
                                     </div>

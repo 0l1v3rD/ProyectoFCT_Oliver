@@ -48,14 +48,14 @@
             <a href="index.php"><img width="100px" id="logo" src="img/logo.png" title="Logo"></a>
                 <div class="offcanvas offcanvas-start" tabindex="-1" id="aside" aria-labelledby="aside">
                     <div class="offcanvas-header">
-                        <img id="logo" width="100px" src="img/logo.png" title="Logo">
+                        <img id="logo_as" width="100px" src="img/logo.png" title="Logo">
                         <h5 class="offcanvas-title" id="titulo">C-Weight</h5>
                         <button type="button" class="btn btn-close bg-danger" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
                         <div>
                             <p><a href="index.php">Inicio</a></p>
-                            <p><a href="index.php">Registro</a></p>
+                            <p><a href="encargo.php">Encargo</a></p>
                         </div>
                         <div>Categorías</div>
                         <div class="dropdown mt-3">
@@ -82,7 +82,7 @@
                 <div class="carrito">
                     <a href="<?php if(isset($_SESSION["carrito"])){ echo("./carrito.php"); } else{ echo("./inicio_sesion.php");}?>"><img src="./img/shopping-cart.png" width="55px" alt="Notificaciones"></a>
                     <?php if(isset($_SESSION["carrito"]) && count($_SESSION["carrito"]) > 0):?>
-                    <span class="cantidad"></span>
+                    <span class="cantidad"><?= count($_SESSION["carrito"]) ?></span>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>

@@ -1,9 +1,39 @@
 <?php
+    session_start();    
     include("../Controller/db.inc");
-    $carrito = array();
     $contador = 0;
-    if(isset($_GET["id"])){
-        $_SESSION["carrito"][] = $_GET["id"];
+    $precio_total = 0;
+    if(isset($_SESSION["carrito"])){
+        if((isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0') && isset($_GET["id"])){
+            header("Location: carrito.php");
+        }
+        else{
+            if(isset($_GET["id"])){
+                if(isset($_GET["cantidad"])){
+                    $id = $_GET["id"];
+                    $cantidad = $_GET["cantidad"];
+                    for ($i=0; $i < $cantidad; $i++) {
+                        $_SESSION["carrito"][] = [
+                            "id" => $id,
+                            "cantidad" => $cantidad
+                        ];
+                    }
+                }
+            }
+            if(isset($_GET["emp"])){
+                if($_GET["emp"] == "*"){
+                    $_SESSION["carrito"] = array();
+                }
+                if(is_numeric($_GET["emp"])){
+                    $pos = array_search($_GET["emp"], $_SESSION["carrito"]);
+                    unset($_SESSION["carrito"][$pos]);
+                }
+            }
+            $carrito = array_merge($_SESSION["carrito"]);
+        }
+    }
+    else{
+        header("location: inicio_sesion.php");
     }
 ?>
 <!DOCTYPE html>
@@ -37,34 +67,50 @@
 <body>
     <div id="header"></div>
     <main>
-        <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Camiseta" href="carrito.php">Carrito</a></p>
-        <div class="m-3">
-            <?php
-            if(isset($_GET["id"])){
-                foreach ($_SESSION["carrito"] as $id) {
-                    $sql = "SELECT * FROM productos WHERE id='$id'";
-                    $res = mysqli_query($conn, $sql);
-                    $carrito[] = $res;
-                }
-            }
-            ?>
-            <h1>Carrito:</h1>
-            <div class="container border border-1 d-flex">
-                <div class="container row col-md-4">
-                    <?php foreach($carrito as $prod): 
-                        $contador++;
+        <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Carrito" href="carrito.php">Carrito</a></p>
+        <h1>Carrito:</h1>
+        <?php if(isset($_SESSION["error"]) && $_SESSION["error"] == "Pedido"): ?>
+            <p class="text-danger">Error en el pedido, contacte con el soporte si necesita ayuda.</p>
+        <?php endif; ?>
+        <?php if(count($_SESSION["carrito"]) > 0): ?>
+        <div class="m-3 d-flex justify-content-around">
+            <div class="container border border-1 d-flex justify-content-center">
+                <div class="row g-2 p-1 w-100 m-2 justify-content-center">
+                    <?php foreach($carrito as $prod):
+                        $id = $prod["id"];
+                        $contador += $prod["cantidad"];
+                        $sql = "SELECT * FROM productos WHERE id='$id'";
+                        $res = mysqli_query($conn, $sql);
+                        $prod = mysqli_fetch_assoc($res);
+                        $precio_total += $prod["precio_unidad"];
                     ?>
-                        <div class="card h-100">
-                            <div class="card-body d-flex flex-column text-center">
-                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
-                                title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
-                                <p class="card-text"><?= $prod["nombre"] ?></p>
+                        <div class="col-12 col-md-4 m-0 p-2">
+                            <div class="card h-100 m-1">
+                                <div class="card-body p-0 d-flex flex-column text-center align-items-center">
+                                    <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="mb-3"
+                                    title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px" width="250px"></a>
+                                    <p class="card-text"><?= $prod["nombre"] ?></p>
+                                    <a class="btn btn-danger w-50" href="carrito.php?emp=<?= $prod["id"] ?>">Eliminar</a>
+                                </div>
                             </div>
-                        </div>            
-
-                </div>
+                        </div>
                     <?php endforeach; ?>
+                </div>
             </div>
+            <?php endif; ?>
+            <?php if(count($_SESSION["carrito"]) == 0): ?>
+            <div class="container text-center">
+                <h1>No hay productos en el carrito...</h1>
+            </div>
+            <?php endif; ?>
+            <?php if(count($_SESSION["carrito"]) > 0): ?>
+            <div class="border border-1 p-2">
+                <p>Precio total: <?= $precio_total; ?>€</p>
+                <p>Cantidad de productos: <?= $contador; ?></p>
+                <button class="btn btn-primary"><a href="./pedido.php">Realizar pedido</a></button>
+                <a href="carrito.php?emp=*" class="btn btn-danger"><button class="btn btn-danger">Vaciar</button></a>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
     <div id="footer"></div>
