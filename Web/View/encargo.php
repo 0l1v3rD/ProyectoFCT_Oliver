@@ -34,59 +34,92 @@
                 }
             }
         }
+        // Inserto el producto como producto con encargo 1 (1 es que es un encargo)
         $sql = "INSERT INTO productos(nombre, descripcion, stock, encargo, tipo, img_url) VALUES('$nombre', '$desc', '$stock', 1, '$tipo', '$img_url_completa')";
         if(mysqli_query($conn, $sql)){
             $insertado = TRUE;
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                // Autenticacion
-                $mail->SMTPAuth = true;
-                // El que lo manda
-                $mail->Username = 'oliveraprietabotones@gmail.com';
-                // Clave de Gmail del que lo manda (Cuidado!)
-                $mail->Password = 'vkcd mquk hqwr kact';
-                // Encriptacion
-                $mail->SMTPSecure = 'tls';
-                $mail->Port = 587;
-                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
-                // El que lo recibe
-                $mail->addAddress("oliverdominguezmoreno@gmail.com");
-                // Titulo del mail
-                $mail->Subject = 'Encargo realizado';
-                // Contenido
-                $mail->Body = "El cliente " . $_SESSION['nombre'] . " ha realizado un encargo de un producto " . $tipo . "\n Tiene el nombre " . $nombre . ".";
-                $mail->send();
+            $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
+            if(mysqli_query($conn, $sql)){
+                $res = mysqli_query($conn, $sql);
+                $pedido = mysqli_fetch_assoc($res);
+                // ID maxima que hay ahora +1 para insertar
+                $id_pedido = $pedido["id"] + 1;
             }
-            catch (Exception $e) {
-                $_SESSION["error"] = "Error correo automático";
+            else{
+                // Si no hay se pone 0, ayuda para poder inicializar la tabla con números nuevos
+                $id_pedido = 0;
             }
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                // Autenticacion
-                $mail->SMTPAuth = true;
-                // El que lo manda
-                $mail->Username = 'oliveraprietabotones@gmail.com';
-                // Clave de Gmail del que lo manda (Cuidado!)
-                $mail->Password = 'vkcd mquk hqwr kact';
-                // Encriptacion
-                $mail->SMTPSecure = 'tls';
-                $mail->Port = 587;
-                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
-                // El que lo recibe
-                $mail->addAddress("$mail_cliente");
-                // Titulo del mail
-                $mail->Subject = 'Encargo realizado';
-                // Contenido
-                $mail->Body = "Felicidades, hemos recibido el encargo y hemos empezado en su creación, si tiene algún detalle más en la producción o quiere preguntar cualquier cosa sobre su encargo, porfavor, no dude en enviarnos un email a soporte@c-weight.com \n Gracias por la confianza que tiene en nosotros!";
-                $mail->send();
-            }
-            catch (Exception $e) {
-                $_SESSION["error"] = "Error correo automático a cliente";
-            }
+            $sql = "INSERT into pedidos(id, id_cliente, fecha_inicio, fecha_final, estado) VALUES($id_pedido, $id_usuario, '$fecha_hoy', '$fecha_formato', 'Pendiente')";
+            $res = mysqli_query($conn, $sql);
+                if($res){
+                    $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
+                    $res = mysqli_query($conn, $sql);
+                    $pedido = mysqli_fetch_assoc($res);
+                    $id_pedido = $pedido["id"];
+                    $sql = "SELECT id FROM pedidos WHERE id=(SELECT max(id) FROM productos)";
+                    $id_producto = $prod["id"];
+                    $sql = "SELECT * FROM productos WHERE id = $id_producto";
+                    $res = mysqli_query($conn, $sql);
+                    $producto = mysqli_fetch_assoc($res);
+                    if($res){
+                        if($producto["stock"] >= 1){
+                            $precio_total = $producto["precio_unidad"] * $prod["cantidad"];
+                            $cantidad_producto = $prod["cantidad"]; 
+                            $sql = "INSERT into pedido_detalles(id_pedido, id_producto, cantidad, precio_total) VALUES($id_pedido, $id_producto, '$cantidad_producto', '$precio_total')";
+                            $res = mysqli_query($conn, $sql);
+                            $mail = new PHPMailer(true);
+                            try {
+                                $mail->isSMTP();
+                                $mail->Host = 'smtp.gmail.com';
+                                // Autenticacion
+                                $mail->SMTPAuth = true;
+                                // El que lo manda
+                                $mail->Username = 'oliveraprietabotones@gmail.com';
+                                // Clave de Gmail del que lo manda (Cuidado!)
+                                $mail->Password = 'vkcd mquk hqwr kact';
+                                // Encriptacion
+                                $mail->SMTPSecure = 'tls';
+                                $mail->Port = 587;
+                                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                                // El que lo recibe
+                                $mail->addAddress("oliverdominguezmoreno@gmail.com");
+                                // Titulo del mail
+                                $mail->Subject = 'Encargo realizado';
+                                // Contenido
+                                $mail->Body = "El cliente " . $_SESSION['nombre'] . " ha realizado un encargo de un producto " . $tipo . "\n Tiene el nombre " . $nombre . ".";
+                                $mail->send();
+                            }
+                            catch (Exception $e) {
+                                $_SESSION["error"] = "Error correo automático";
+                            }
+                            $mail = new PHPMailer(true);
+                            try {
+                                $mail->isSMTP();
+                                $mail->Host = 'smtp.gmail.com';
+                                // Autenticacion
+                                $mail->SMTPAuth = true;
+                                // El que lo manda
+                                $mail->Username = 'oliveraprietabotones@gmail.com';
+                                // Clave de Gmail del que lo manda (Cuidado!)
+                                $mail->Password = 'vkcd mquk hqwr kact';
+                                // Encriptacion
+                                $mail->SMTPSecure = 'tls';
+                                $mail->Port = 587;
+                                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                                // El que lo recibe
+                                $mail->addAddress("$mail_cliente");
+                                // Titulo del mail
+                                $mail->Subject = 'Encargo realizado';
+                                // Contenido
+                                $mail->Body = "Felicidades, hemos recibido el encargo y hemos empezado en su creación, si tiene algún detalle más en la producción o quiere preguntar cualquier cosa sobre su encargo, porfavor, no dude en enviarnos un email a soporte@c-weight.com \n Gracias por la confianza que tiene en nosotros!";
+                                $mail->send();
+                            }
+                            catch (Exception $e) {
+                                $_SESSION["error"] = "Error correo automático a cliente";
+                            }
+                        }
+                    }
+                }
         }
     }
 ?>
