@@ -1,7 +1,14 @@
 <?php
     session_start();
     include("../Controller/db.inc");
-    if(isset($_GET["ins"])){
+    include("../Controller/mail/mail.php");
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\Exception;
+    $mail_cliente = $_SESSION["email"];
+    if(!isset($_SESSION["id"])){
+        header("Location: inicio_sesion.php");
+    }
+    if(isset($_POST["nombre"])){
         $nombre = $_POST["nombre"];
         $desc = $_POST["descripcion"];
         $stock = $_POST["stock"];
@@ -9,33 +16,83 @@
         // Imagen
         $allowedExtensions = ['jpg', 'png'];
         // Check
-        if(isset($_FILES["img_usr"]) && $_FILES["img_usr"]["error"] == 0){
+        if(isset($_FILES["imagen"]) && $_FILES["imagen"]["error"] == 0){
             // Tipos de imagen aceptados
             $allowedExtensions = ['jpg', 'png'];
             // Tipo de imagen
-            $tipo = strtolower(pathinfo($_FILES["img_usr"]["name"], PATHINFO_EXTENSION));
+            $tipo = strtolower(pathinfo($_FILES["imagen"]["name"], PATHINFO_EXTENSION));
             // Si tipo esta aceptado
             if(in_array($tipo, $allowedExtensions)){
                 // uniqid genera un numero que si o si es unico y lo pongo como nombre de imagen con su tipo al final
                 $nombre_archivo = uniqid('', true) . '.' . $tipo;
                 // Donde voy a mandar la imagen junto a la imagen en si
-                $ruta_destino = './img/img_usr/' . $nombre_archivo;
+                $ruta_destino = './img/img_prod/' . $nombre_archivo;
                 // Mueve imagen
-                if(move_uploaded_file($_FILES["img_usr"]["tmp_name"], $ruta_destino)){
+                if(move_uploaded_file($_FILES["imagen"]["tmp_name"], $ruta_destino)){
                     // Para que los ficheros en View puedan acceder
-                    $imagen_url_completa = "./img/img_usr/" . $nombre_archivo;
+                    $imagen_url_completa = "./img/img_prod/" . $nombre_archivo;
                 }
             }
         }
-        $sql = "INSERT INTO productos(nombre, descripcion, stock, encargo, tipo, img_url) VALUES('$nombre', '$desc', '$stock', 1, '$tipo', '$img_url')";
+        $sql = "INSERT INTO productos(nombre, descripcion, stock, encargo, tipo, img_url) VALUES('$nombre', '$desc', '$stock', 1, '$tipo', '$img_url_completa')";
         if(mysqli_query($conn, $sql)){
             $insertado = TRUE;
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                // Autenticacion
+                $mail->SMTPAuth = true;
+                // El que lo manda
+                $mail->Username = 'oliveraprietabotones@gmail.com';
+                // Clave de Gmail del que lo manda (Cuidado!)
+                $mail->Password = 'vkcd mquk hqwr kact';
+                // Encriptacion
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                // El que lo recibe
+                $mail->addAddress("oliverdominguezmoreno@gmail.com");
+                // Titulo del mail
+                $mail->Subject = 'Encargo realizado';
+                // Contenido
+                $mail->Body = "El cliente " . $_SESSION['nombre'] . " ha realizado un encargo de un producto " . $tipo . "\n Tiene el nombre " . $nombre . ".";
+                $mail->send();
+            }
+            catch (Exception $e) {
+                $_SESSION["error"] = "Error correo automático";
+            }
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                // Autenticacion
+                $mail->SMTPAuth = true;
+                // El que lo manda
+                $mail->Username = 'oliveraprietabotones@gmail.com';
+                // Clave de Gmail del que lo manda (Cuidado!)
+                $mail->Password = 'vkcd mquk hqwr kact';
+                // Encriptacion
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                // El que lo recibe
+                $mail->addAddress("$mail_cliente");
+                // Titulo del mail
+                $mail->Subject = 'Encargo realizado';
+                // Contenido
+                $mail->Body = "Felicidades, hemos recibido el encargo y hemos empezado en su creación, si tiene algún detalle más en la producción o quiere preguntar cualquier cosa sobre su encargo, porfavor, no dude en enviarnos un email a soporte@c-weight.com \n Gracias por la confianza que tiene en nosotros!";
+                $mail->send();
+            }
+            catch (Exception $e) {
+                $_SESSION["error"] = "Error correo automático a cliente";
+            }
         }
     }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,18 +120,19 @@
 <body>
     <div id="header"></div>
     <main class="d-flex justify-content-center">
-        <?php if($insertado): ?>
-            <h2 class="text-success"></h2>
+        <?php if(isset($insertado) && $insertado): ?>
+            <h2 class="text-success">Encargo enviado!</h2>
         <?php endif; ?>
-        <form action="encargo.php?ins=" enctype="multipart/form-data" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
+        <form action="encargo.php" enctype="multipart/form-data" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
+            <h2>Encargo</h2>
             <label for="nombre" class="form-label">Nombre:</label>
             <input name="nombre" type="text" class="form-control" placeholder="Nombre">
             <label for="descripcion" class="form-label">Descripción:</label>
-            <textarea name="descripcion" placeholder="Descripción"></textarea>
+            <textarea name="descripcion" placeholder="Descripción" class="form-control border-1 border-black"></textarea>
             <label for="stock" class="form-label">Stock</label>
-            <input name="stock" type="number" min="1" max="999">
+            <input name="stock" type="number" min="1" max="999" class="form-control border-1 border-black">
             <label for="tipo" class="form-label">Tipo de producto:</label>
-            <input name="tipo">
+            <input name="tipo" type="text" class="form-control border-1 border-black">
             <label for="imagen" class="form-label">Imagen</label>
             <input type="file" name="imagen">
             <button type="submit" class="btn btn-primary">Enviar</button>

@@ -121,22 +121,95 @@
             <div class="p-2 vw-100">
                 <h2>Pedidos:</h2>
                 <div class="m-2">
-                    <?php $contador = 0;
+                    <?php $contador = 1;
                         foreach ($pedidos as $pedido):
                         $fecha_inicio = strtotime($pedido["fecha_inicio"]);
                         $fecha_inicio = date("d-m-Y", $fecha_inicio);
                         $fecha_final = strtotime($pedido["fecha_final"]);
                         $fecha_final = date("d-m-Y", $fecha_final);
-                        $contador++;
                     ?>
                         <div class="border border-1 p-2">
                         <h2>Pedido <?= $contador ?></h2>
                             <p><?= "Fecha de inicio: " . $fecha_inicio ?></p>
                             <p><?= "Fecha aproximada de entrega: " . $fecha_final ?></p>
                             <p><?= "Estado del pedido: " . $pedido["estado"] ?></p>
-                            <a href="usuario.php?del=<?= $pedido["id"] ?>" class="btn btn-danger">Cancelar</a>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#<?= $pedido["id"] ?>">
+                                Detalles
+                            </button>
+                            <!-- Modal -->
+                            <div class="modal fade" id="<?= $pedido["id"] ?>" data-bs-keyboard="false" tabindex="-1" aria-labelledby="<?= $pedido["id"] ?>" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title h2" id="modal">Pedido <?= $contador ?></h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h3>Id del pedido: <?= $pedido["id"] ?></h3>
+                                        <?php
+                                            $id_pedido = $pedido["id"];
+                                            $sql = "SELECT * FROM pedido_detalles WHERE id_pedido=$id_pedido";
+                                            $res = mysqli_query($conn, $sql);
+                                            if($res):
+                                                $pedido_detalles = mysqli_fetch_all($res, MYSQLI_ASSOC);
+                                                $contador_detalles = 1;
+                                                foreach($pedido_detalles as $pedido_detalle):
+                                                
+                                            ?>
+                                            <div class="d-flex flex-column">
+                                                
+                                                <?php
+                                                    $id_producto = $pedido_detalle["id_producto"];
+                                                    $sql = "SELECT nombre FROM productos WHERE id=$id_producto";
+                                                    $res = mysqli_query($conn, $sql);
+                                                    if($res){
+                                                        $res = mysqli_fetch_row($res);
+                                                        $nombre_producto = $res[0];
+                                                    }
+                                                    ?>
+                                                <h5>Nombre del producto: <?= $nombre_producto ?></h5>
+                                                <h5>Cantidad: <?=  $pedido_detalle["cantidad"]  ?></h5>
+                                                <h5>Precio total: <?= $pedido_detalle["precio_total"] ?>&euro;</h5>
+                                                <?php if($contador_detalles < count($pedido_detalles)): ?>
+                                                <hr>
+                                                <?php endif; ?>
+                                            </div>
+                                            <?php
+                                                $contador_detalles++;
+                                                endforeach;
+                                            endif;
+                                            ?>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#<?= $pedido["id"] ?>_del">Cancelar</button>
+                            <div class="modal fade" id="<?= $pedido["id"] ?>_del" data-bs-keyboard="false" tabindex="-1" aria-labelledby="<?= $pedido["id"] ?>_del" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title" id="staticBackdropLabel">Confirmación</h3>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h4>Estás seguro de eliminar este pedido?</h4>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="usuario.php?del=<?= $pedido["id"] ?>" class="btn btn-danger">Eliminar</a>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    <?php endforeach; ?>
+                    <?php
+                        $contador++;
+                        endforeach;
+                    ?>
                 </div>
             </div>
             <?php endif; ?>

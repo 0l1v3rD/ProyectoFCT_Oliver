@@ -4,7 +4,7 @@
     $error = "";
     if(isset($_GET["nombre"]) && $_GET["nombre"] != ""){
         $nombre_busq = $_GET["nombre"];
-        $sql = "SELECT * FROM productos WHERE nombre LIKE '%$nombre_busq%'";
+        $sql = "SELECT * FROM productos WHERE nombre LIKE '%$nombre_busq%' AND encargo=0";
         $res = mysqli_query($conn, $sql);
         $productos = mysqli_fetch_all($res, MYSQLI_ASSOC);
         $contador = 0;
@@ -52,14 +52,14 @@
                     <div class="container d-flex flex-column gap-3 w-100">
                     <hr>
                         <div class="row justify-content-around w-100 g-3">
-                                <?php if(isset($_GET["nombre"]) && $nombre_busq != ""):
+                                <?php if(isset($_GET["nombre"]) && $nombre_busq != "" && $productos != NULL):
                                         foreach ($productos as $prod):
                                             $contador++; ?>
                                             <!-- Carta para todos los productos de la fila en la que esta el bucle -->
                                             <div class="col-md-4">
                                                 <div class="card h-100">
                                                     <div class="card-body d-flex flex-column text-center">
-                                                        <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= $prod["img_url"] ?>" class="img-fluid mb-3"
+                                                        <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
                                                         title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
                                                         <p class="card-text"><?= $prod["nombre"] ?></p>
                                                         <a href="carrito.php?id=<?= $prod["id"] ?>" class="btn btn-primary mt-auto">Añadir al carrito</a>
@@ -73,8 +73,10 @@
                                         <hr>
                                         <div class="row justify-content-around w-100 g-3">
                                         <?php $contador=0; endif; endforeach; 
-                                        else:?>
+                                        elseif($nombre_busq == ""):?>
                                         <h2 class="text-center">No hay nada en la barra de búsqueda...</h2>
+                                        <?php else: ?>
+                                        <h2 class="text-center">No hay resultados...</h2>
                                         <?php endif; ?>
                         </div>
                 </div>

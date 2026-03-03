@@ -2,32 +2,30 @@
     include("../Controller/db.inc");
     session_start();
     if(isset($_GET["id"])){
-        $id_producto = $_GET["id"];
-        $sql = "SELECT * FROM productos WHERE id='$id_producto'";
-        $res = mysqli_query($conn, $sql);
-        $producto = mysqli_fetch_assoc($res);
-        $precio = $producto["precio_unidad"];
-        if(isset($_SESSION["id"])){
-            $id_cliente = $_SESSION["id"];
+            $id_producto = $_GET["id"];
+            $sql = "SELECT * FROM productos WHERE id='$id_producto'";
+            $res = mysqli_query($conn, $sql);
+            $producto = mysqli_fetch_assoc($res);
+            $precio = $producto["precio_unidad"];
+            if(isset($_SESSION["id"])){
+                $id_cliente = $_SESSION["id"];
+            }
+            $fecha_hoy = date_create();
+            $fecha_esp = date_add($fecha_hoy, date_interval_create_from_date_string("40 days"));
+            if(isset($_GET["ins"]) && isset($_GET["id"]) && isset($_GET["cantidad"])){
+                $_SESSION["carrito"][] = [
+                    "id"=> $_GET["id"],
+                    "cantidad"=> $_GET["cantidad"]
+                ];
+                header("Location: pedido.php");
+            }
+            if(!isset($_SESSION["carrito"])){
+                $_SESSION["carrito"] = array();
+            }
         }
-        $fecha_hoy = date_create();
-        $fecha_esp = date_add($fecha_hoy, date_interval_create_from_date_string("40 days"));
-        if(isset($_GET["ins"]) && isset($_GET["id"]) && isset($_GET["cantidad"])){
-            $_SESSION["carrito"][] = [
-                "id"=> $_GET["id"],
-                "cantidad"=> $_GET["cantidad"]
-            ];
-            header("Location: pedido.php");
-        }
-        if(!isset($_SESION["carrito"])){
-            $_SESSION["carrito"] = array();
-        }
-    }
     else{
-        header("location: index.php");
+        header("Location: index.php");
     }
-    $res = mysqli_query($conn, $sql);
-    $producto = mysqli_fetch_assoc($res);
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +61,7 @@
     <div id="header"></div>
     <main>
         <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="<?= $nombre ?>" href="producto.php?id=<?= $id_producto ?>">Camiseta</a></p>
-        <form id="producto" action="producto.php?id=<?php $id = $_GET["id"]; ?>?ins=1" class="d-flex justify-content-around">
+        <div id="producto"  class="d-flex justify-content-around">
             <div>
                 <img title="<?= $producto["nombre"] ?>" src="<?php if ($producto["img_url"] != "") { echo($producto["img_url"]); } else { echo("./img/broken-image.png"); } ?>" alt="Camiseta">
             </div>
@@ -85,7 +83,7 @@
                     <p>Stock: <b class="text-success">5</b></p>
                     <a href="<?php if(isset($_SESSION["id"])){ echo("carrito.php?id=" . $producto['id']) . "&cantidad=1"; } else{ echo("inicio_sesion.php"); } ?>"><button class="btn btn-primary" type="button">Añadir al carrito.</button></a>
                     <?php if(count($_SESSION["carrito"]) == 0 && isset($_SESSION["email"])): ?>
-                        <br><a><button id="comprar" class="btn btn-warning" type="submit">Comprar.</button></a>
+                        <br><a href="producto.php?id=<?= $_GET["id"]; ?>&ins=1&cantidad=1" id="comprar" class="btn btn-warning">Comprar.</a>
                     <?php endif; ?>
                 </div>
             </div>

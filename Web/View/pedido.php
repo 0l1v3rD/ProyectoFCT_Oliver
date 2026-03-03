@@ -22,16 +22,19 @@
     }
     if(isset($_SESSION["carrito"]) && count($_SESSION["carrito"]) > 0){
         $fecha_hoy = date_create();
-        $fecha_formato = date_add($fecha_hoy, date_interval_create_from_date_string("40 days"));
-        $fecha_hoy = date_sub($fecha_hoy, date_interval_create_from_date_string("40 days"));
+        $fecha_formato = date("Y-m-d", strtotime('+40 days'));
         $fecha_hoy = $fecha_hoy->format('Y-m-d');
-        $fecha_formato = $fecha_formato->format('Y-m-d');
         $carrito = $_SESSION["carrito"];
         $id_usuario = $_SESSION["id"];
         $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
-        $res = mysqli_query($conn, $sql);
-        $pedido = mysqli_fetch_assoc($res);
-        $id_pedido = $pedido["id"] + 1;
+        if(mysqli_query($conn, $sql)){
+            $res = mysqli_query($conn, $sql);
+            $pedido = mysqli_fetch_assoc($res);
+            $id_pedido = $pedido["id"] + 1;
+        }
+        else{
+            $id_pedido = 1;
+        }
         $sql = "INSERT into pedidos(id, id_cliente, fecha_inicio, fecha_final, estado) VALUES($id_pedido, $id_usuario, '$fecha_hoy', '$fecha_formato', 'Pendiente')";
         $res = mysqli_query($conn, $sql);
             if($res){
@@ -69,7 +72,7 @@
                                     // El que lo recibe
                                     $mail->addAddress($email);
                                     // Titulo del mail
-                                    $mail->Subject = 'Registro en C-Weight';
+                                    $mail->Subject = 'Pedido en C-Weight';
                                     // Contenido
                                     $mail->Body = "Pedido realizado en $fecha_hoy correctamente , entrega estimada en $fecha_formato.";
                                     $mail->send();
@@ -92,7 +95,7 @@
         }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
