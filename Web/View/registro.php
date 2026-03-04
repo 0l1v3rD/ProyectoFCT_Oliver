@@ -42,7 +42,7 @@
         $res = mysqli_query($conn, $sql);
         if(mysqli_num_rows($res) > 0){
             $_SESSION["error"] = "Usuario";
-            header("registro.php");
+            header("Location: registro.php");
         }
         else{
             # Lo mismo con el cliente
@@ -50,16 +50,19 @@
             $res = mysqli_query($conn, $sql);
             if(mysqli_num_rows($res) > 0){
                 $_SESSION["error"] = "Cliente";
-                header("registro.php");
+                header("Location: registro.php");
             }
             else{
                 #Inserto usuario
                 $sql = "INSERT into usuarios(nombre, email, password, imagen_url) VALUES('$nombre', '$email', '$password', '$imagen_url_completa')";
-                mysqli_query($conn, $sql);
+                $res = mysqli_query($conn, $sql);
                 if(mysqli_affected_rows($conn) > 0){
-                    $id_usuario = $_SESSION["id"];
+                    $sql = "SELECT * FROM usuarios WHERE email='$email'";
+                    $res = mysqli_query($conn, $sql);
                     #Inserto cliente
-                    $sql = "INSERT into clientes(id_usuario, nombre, apellidos, email, genero, direccion, codpostal, poblacion, provincia, password) VALUES($id_usuario, '$nombre', '$apellidos', '$email', '$genero', '$direccion', '$postal', '$poblacion', '$provincia', '$password')";
+                    $cliente = mysqli_fetch_assoc($res);
+                    $id = $cliente["id"];
+                    $sql = "INSERT into clientes(id_usuario, nombre, apellidos, email, genero, direccion, codpostal, poblacion, provincia, password) VALUES($id, '$nombre', '$apellidos', '$email', '$genero', '$direccion', '$postal', '$poblacion', '$provincia', '$password')";
                     mysqli_query($conn, $sql);
                     if(mysqli_affected_rows($conn) > 0){
                         // Mail
@@ -88,16 +91,16 @@
                         catch (Exception $e) {
                             $_SESSION["error"] = "Error correo automático";
                         }
-                        header("inicio_sesion.php");
+                        header("Location: inicio_sesion.php");
                     }
                     else{
                         $_SESSION["error"] = "Cliente Ins";
-                        header("registro.php");
+                        header("Location: registro.php");
                     }
                 }
                 else{
                     $_SESSION["error"] = "Usuario Ins";
-                    header("registro.php");
+                    header("Location: registro.php");
                 }
             }
         } 
@@ -154,7 +157,7 @@
                 <label for="nombre" class="form-label">Apellidos</label>
                 <input class="form-control" required type="text" label="apellidos" name="apellidos" maxlength="75">
                 <p class="form-label">Género</p>
-                <div class="">
+                <div>
                     <input id="M" type="radio" name="genero" value="M"> <label class="form-label" for="M">Mujer</label><br>
                     <input id="H" type="radio" name="genero" value="H"> <label class="form-label" for="H">Hombre</label><br>
                 </div>
@@ -163,9 +166,7 @@
                 <label for="poblacion" class="form-label">Población</label>
                 <input id="poblacion" required class="form-control" type="text" label="poblacion" name="poblacion" maxlength="100">
                 <label for="provincia" class="form-label">Provincia</label>
-                <input id="provincia" required class="form-control" type="text" label="provincia" name="provincia" maxlength="100">
-                <label for="direccion" class="form-label">Dirección</label>
-                <input id="direccion" required class="form-control" type="text" label="direccion" name="direccion" maxlength="100">
+                <input id="provincia" required class="form-control" type="text" label="provincia" name="provincia" maxlength="100"> 
                 <label for="postal" class="form-label">Cod. Postal</label>
                 <input id="postal" required class="form-control" type="number" label="postal" name="postal" maxlength="5">
                 <label for="email" class="form-label">Correo electrónico</label>
