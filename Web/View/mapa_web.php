@@ -32,6 +32,8 @@
     <main class="d-flex flex-column text-center m-2">
         <p><a href="index.php">Inicio</a></p>
         <p><a href="registro.php">Registro</a></p>
+        <p><a href="carrito.php">Carrito</a></p>
+        <p><a href="encargo.php">Encargo</a></p>
         <p><a href="mapa_web.php">Mapa Web</a></p>
     </main>
     <div id="footer"></div>

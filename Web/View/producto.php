@@ -5,8 +5,13 @@
             $id_producto = $_GET["id"];
             $sql = "SELECT * FROM productos WHERE id='$id_producto'";
             $res = mysqli_query($conn, $sql);
-            $producto = mysqli_fetch_assoc($res);
-            $precio = $producto["precio_unidad"];
+            if(mysqli_num_rows($res) > 0){
+                $producto = mysqli_fetch_assoc($res);
+                $precio = $producto["precio_unidad"];
+            }
+            else{
+                header("Location: index.php");
+            }
             if(isset($_SESSION["id"])){
                 $id_cliente = $_SESSION["id"];
             }
@@ -80,7 +85,7 @@
                     </div>-->
                     <p>Almacén más cercano: <b class="text-success">Torrevieja</b></p>
                     <p>Envio: <b class="text-success">Gratis</b></p>
-                    <p>Stock: <b class="text-success">5</b></p>
+                    <p>Stock: <b class="text-success"><?= $producto["stock"] ?></b></p>
                     <a href="<?php if(isset($_SESSION["id"])){ echo("carrito.php?id=" . $producto['id']) . "&cantidad=1"; } else{ echo("inicio_sesion.php"); } ?>"><button class="btn btn-primary" type="button">Añadir al carrito.</button></a>
                     <?php if(count($_SESSION["carrito"]) == 0 && isset($_SESSION["email"])): ?>
                         <br><a href="producto.php?id=<?= $_GET["id"]; ?>&ins=1&cantidad=1" id="comprar" class="btn btn-warning">Comprar.</a>
