@@ -3,6 +3,9 @@
     include("../Controller/db.inc");
     $contador = 0;
     $precio_total = 0;
+    if(!isset($_SESSION["id"])){
+        header("Location: inicio_sesion.php");
+    }
     if(isset($_SESSION["carrito"])){
         if((isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0') && isset($_GET["id"])){
             header("Location: carrito.php");
@@ -11,12 +14,16 @@
             if(isset($_GET["id"])){
                 if(isset($_GET["cantidad"])){
                     $id = $_GET["id"];
-                    $cantidad = $_GET["cantidad"];
-                    for ($i=0; $i < $cantidad; $i++) {
-                        $_SESSION["carrito"][] = [
-                            "id" => $id,
-                            "cantidad" => $cantidad
-                        ];
+                    $sql = "SELECT id FROM productos WHERE id=$id";
+                    $res = mysqli_query($conn, $sql);
+                    if(mysqli_num_rows($res) > 0){
+                        $cantidad = $_GET["cantidad"];
+                        for ($i=0; $i < $cantidad; $i++) {
+                            $_SESSION["carrito"][] = [
+                                "id" => $id,
+                                "cantidad" => $cantidad
+                            ];
+                        }
                     }
                 }
             }
