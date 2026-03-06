@@ -72,7 +72,7 @@
                 </div>
         </div>
         <form class="d-flex mx-auto form-inline" action="busqueda.php?nombre=<?php if(isset($_POST["prod"])) {echo($_POST["prod"]);} ?>" style="max-width: 400px;">
-            <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="nombre">
+            <input id="search" class="form-control mr-sm-2" minlength="3" type="search" placeholder="Search" aria-label="Search" name="nombre">
             <button class="btn btn-outline-success my-2 my-sm-0 mx-2" type="submit">Search</button>
         </form>
         <div class="d-flex align-items-center flex-sm-row justify-content-center gap-2">

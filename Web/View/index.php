@@ -122,7 +122,9 @@
                             <div class="container">
                                 <!-- Conjunto productos-->
                                 <div class="row justify-content-center g-3">
-                                <?php foreach ($pantalones as $prod):
+                                <?php
+                                    $contador = 0;
+                                    foreach ($pantalones as $prod):
                                     $contador++; ?>
                                     <!-- Carta para todos los productos de la fila en la que esta el bucle -->
                                     <div class="col-md-4">

@@ -9,6 +9,7 @@
         header("Location: inicio_sesion.php");
     }
     if(isset($_POST["nombre"])){
+        $id_usuario = $_SESSION["id"];
         $nombre = $_POST["nombre"];
         $desc = $_POST["descripcion"];
         $stock = $_POST["stock"];
@@ -32,95 +33,105 @@
                     // Para que los ficheros en View puedan acceder
                     $imagen_url_completa = "./img/img_prod/" . $nombre_archivo;
                 }
-            }
-        }
-        // Inserto el producto como producto con encargo 1 (1 es que es un encargo)
-        $sql = "INSERT INTO productos(nombre, descripcion, stock, encargo, tipo, img_url) VALUES('$nombre', '$desc', '$stock', 1, '$tipo', '$img_url_completa')";
-        if(mysqli_query($conn, $sql)){
-            $insertado = TRUE;
-            $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
-            if(mysqli_query($conn, $sql)){
-                $res = mysqli_query($conn, $sql);
-                $pedido = mysqli_fetch_assoc($res);
-                // ID maxima que hay ahora +1 para insertar
-                $id_pedido = $pedido["id"] + 1;
-            }
-            else{
-                // Si no hay se pone 0, ayuda para poder inicializar la tabla con números nuevos
-                $id_pedido = 0;
-            }
-            $sql = "INSERT into pedidos(id, id_cliente, fecha_inicio, fecha_final, estado) VALUES($id_pedido, $id_usuario, '$fecha_hoy', '$fecha_formato', 'Pendiente')";
-            $res = mysqli_query($conn, $sql);
-                if($res){
+                $tipo = $_POST["tipo"];
+                // Inserto el producto como producto con encargo 1 (1 es que es un encargo)
+                $sql = "INSERT INTO productos(nombre, descripcion, stock, encargo, tipo, img_url) VALUES('$nombre', '$desc', '$stock', 1, '$tipo', '$imagen_url_completa')";
+                if(mysqli_query($conn, $sql)){
+                    $insertado = TRUE;
                     $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
+                    if(mysqli_query($conn, $sql)){
+                        $res = mysqli_query($conn, $sql);
+                        $pedido = mysqli_fetch_assoc($res);
+                        // ID maxima que hay ahora +1 para insertar
+                        $id_pedido = $pedido["id"] + 1;
+                    }
+                    else{
+                        // Si no hay se pone 0, ayuda para poder inicializar la tabla con números nuevos
+                        $id_pedido = 0;
+                    }
+                    $fecha_hoy = date_create();
+                    $fecha_formato = date("Y-m-d", strtotime('+40 days'));
+                    $fecha_hoy = $fecha_hoy->format('Y-m-d');
+                    $sql = "INSERT into pedidos(id, id_cliente, fecha_inicio, fecha_final, estado) VALUES($id_pedido, $id_usuario, '$fecha_hoy', '$fecha_formato', 'Pendiente')";
                     $res = mysqli_query($conn, $sql);
-                    $pedido = mysqli_fetch_assoc($res);
-                    $id_pedido = $pedido["id"];
-                    $sql = "SELECT id FROM pedidos WHERE id=(SELECT max(id) FROM productos)";
-                    $id_producto = $prod["id"];
-                    $sql = "SELECT * FROM productos WHERE id = $id_producto";
-                    $res = mysqli_query($conn, $sql);
-                    $producto = mysqli_fetch_assoc($res);
-                    if($res){
-                        if($producto["stock"] >= 1){
-                            $precio_total = $producto["precio_unidad"] * $prod["cantidad"];
-                            $cantidad_producto = $prod["cantidad"]; 
-                            $sql = "INSERT into pedido_detalles(id_pedido, id_producto, cantidad, precio_total) VALUES($id_pedido, $id_producto, '$cantidad_producto', '$precio_total')";
+                        if($res){
+                            $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
                             $res = mysqli_query($conn, $sql);
-                            $mail = new PHPMailer(true);
-                            try {
-                                $mail->isSMTP();
-                                $mail->Host = 'smtp.gmail.com';
-                                // Autenticacion
-                                $mail->SMTPAuth = true;
-                                // El que lo manda
-                                $mail->Username = 'oliveraprietabotones@gmail.com';
-                                // Clave de Gmail del que lo manda (Cuidado!)
-                                $mail->Password = 'vkcd mquk hqwr kact';
-                                // Encriptacion
-                                $mail->SMTPSecure = 'tls';
-                                $mail->Port = 587;
-                                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
-                                // El que lo recibe
-                                $mail->addAddress("oliverdominguezmoreno@gmail.com");
-                                // Titulo del mail
-                                $mail->Subject = 'Encargo realizado';
-                                // Contenido
-                                $mail->Body = "El cliente " . $_SESSION['nombre'] . " ha realizado un encargo de un producto " . $tipo . "\n Tiene el nombre " . $nombre . ".";
-                                $mail->send();
-                            }
-                            catch (Exception $e) {
-                                $_SESSION["error"] = "Error correo automático";
-                            }
-                            $mail = new PHPMailer(true);
-                            try {
-                                $mail->isSMTP();
-                                $mail->Host = 'smtp.gmail.com';
-                                // Autenticacion
-                                $mail->SMTPAuth = true;
-                                // El que lo manda
-                                $mail->Username = 'oliveraprietabotones@gmail.com';
-                                // Clave de Gmail del que lo manda (Cuidado!)
-                                $mail->Password = 'vkcd mquk hqwr kact';
-                                // Encriptacion
-                                $mail->SMTPSecure = 'tls';
-                                $mail->Port = 587;
-                                $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
-                                // El que lo recibe
-                                $mail->addAddress("$mail_cliente");
-                                // Titulo del mail
-                                $mail->Subject = 'Encargo realizado';
-                                // Contenido
-                                $mail->Body = "Felicidades, hemos recibido el encargo y hemos empezado en su creación, si tiene algún detalle más en la producción o quiere preguntar cualquier cosa sobre su encargo, porfavor, no dude en enviarnos un email a soporte@c-weight.com \n Gracias por la confianza que tiene en nosotros!";
-                                $mail->send();
-                            }
-                            catch (Exception $e) {
-                                $_SESSION["error"] = "Error correo automático a cliente";
+                            $pedido = mysqli_fetch_assoc($res);
+                            $id_pedido = $pedido["id"];
+                            $sql = "SELECT id FROM productos WHERE id=(SELECT max(id) FROM productos)";
+                            $res = mysqli_query($conn, $sql);
+                            $prod = mysqli_fetch_assoc($res);
+                            $id_producto = $prod["id"];
+                            $sql = "SELECT * FROM productos WHERE id = $id_producto";
+                            $res = mysqli_query($conn, $sql);
+                            $producto = mysqli_fetch_assoc($res);
+                            if($res){
+                                if($producto["stock"] >= 1){
+                                    $cantidad = $producto["stock"];
+                                    $precio_total = $producto["precio_unidad"] * 1;
+                                    $sql = "INSERT into pedido_detalles(id_pedido, id_producto, cantidad, precio_total) VALUES($id_pedido, $id_producto, '$cantidad', '$precio_total')";
+                                    $res = mysqli_query($conn, $sql);
+                                    $mail = new PHPMailer(true);
+                                    try {
+                                        $mail->isSMTP();
+                                        $mail->Host = 'smtp.gmail.com';
+                                        // Autenticacion
+                                        $mail->SMTPAuth = true;
+                                        // El que lo manda
+                                        $mail->Username = 'oliveraprietabotones@gmail.com';
+                                        // Clave de Gmail del que lo manda (Cuidado!)
+                                        $mail->Password = 'vkcd mquk hqwr kact';
+                                        // Encriptacion
+                                        $mail->SMTPSecure = 'tls';
+                                        $mail->Port = 587;
+                                        $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                                        // El que lo recibe
+                                        $mail->addAddress("oliverdominguezmoreno@gmail.com");
+                                        // Titulo del mail
+                                        $mail->Subject = 'Encargo realizado';
+                                        // Contenido
+                                        $mail->Body = "El cliente " . $_SESSION['nombre'] . " ha realizado un encargo de un producto " . $tipo . "\n Tiene el nombre " . $nombre . ".";
+                                        $mail->send();
+                                    }
+                                    catch (Exception $e) {
+                                        $_SESSION["error"] = "Error correo automático";
+                                    }
+                                    $mail = new PHPMailer(true);
+                                    try {
+                                        $mail->isSMTP();
+                                        $mail->Host = 'smtp.gmail.com';
+                                        // Autenticacion
+                                        $mail->SMTPAuth = true;
+                                        // El que lo manda
+                                        $mail->Username = 'oliveraprietabotones@gmail.com';
+                                        // Clave de Gmail del que lo manda (Cuidado!)
+                                        $mail->Password = 'vkcd mquk hqwr kact';
+                                        // Encriptacion
+                                        $mail->SMTPSecure = 'tls';
+                                        $mail->Port = 587;
+                                        $mail->setFrom('oliveraprietabotones@gmail.com', 'C-Weight Company');
+                                        // El que lo recibe
+                                        $mail->addAddress("$mail_cliente");
+                                        // Titulo del mail
+                                        $mail->Subject = 'Encargo realizado';
+                                        // Contenido
+                                        $mail->Body = "Felicidades, hemos recibido el encargo y hemos empezado en su creación, si tiene algún detalle más en la producción o quiere preguntar cualquier cosa sobre su encargo, porfavor, no dude en enviarnos un email a soporte@c-weight.com \n Gracias por la confianza que tiene en nosotros!";
+                                        $mail->send();
+                                    }
+                                    catch (Exception $e) {
+                                        $_SESSION["error"] = "Error correo automático a cliente";
+                                    }
+                                }
                             }
                         }
-                    }
                 }
+            }
+            else{
+                $imagen_url_completa = "";
+            }
         }
+        
     }
 ?>
 
@@ -153,11 +164,14 @@
 <body>
     <div id="header"></div>
     <main class="d-flex justify-content-center">
-        <?php if(isset($insertado) && $insertado): ?>
-            <h2 class="text-success">Encargo enviado!</h2>
-        <?php endif; ?>
-        <form action="encargo.php" enctype="multipart/form-data" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
+        <form action="encargo.php" method="post" enctype="multipart/form-data" class="d-flex flex-column justify-content-center m-4 w-75 gap-3">
             <h2>Encargo</h2>
+            <?php if(isset($insertado) && $insertado): ?>
+                <h2 class="text-success">Encargo enviado!</h2>
+            <?php endif; ?>
+            <?php if(isset($imagen_url_completa) && $imagen_url_completa == ""): ?>
+                <h2 class="text-danger">Error con el tipo de imágen, por favor use un archivo PNG o JPG.</h2>
+            <?php endif; ?>
             <label for="nombre" class="form-label">Nombre:</label>
             <input name="nombre" type="text" class="form-control" placeholder="Nombre">
             <label for="descripcion" class="form-label">Descripción:</label>

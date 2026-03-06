@@ -72,9 +72,7 @@
                                         </div>
                                         <hr>
                                         <div class="row justify-content-around w-100 g-3">
-                                        <?php $contador=0; endif; endforeach; 
-                                        elseif($nombre_busq == ""):?>
-                                        <h2 class="text-center">No hay nada en la barra de búsqueda...</h2>
+                                        <?php $contador=0; endif; endforeach; ?>
                                         <?php else: ?>
                                         <h2 class="text-center">No hay resultados...</h2>
                                         <?php endif; ?>
