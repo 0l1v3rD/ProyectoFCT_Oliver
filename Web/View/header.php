@@ -1,30 +1,25 @@
 <?php
     session_start();
     include("../Controller/db.inc");
-    $_SESSION["error"] = "";
     if(isset($_SESSION["email"]))
     {
-        $email = $_SESSION["email"];
-        $sql = "SELECT id, nombre, email, imagen_url FROM usuarios WHERE email='$email'";
+        $nombre = $_SESSION["nombre"];
+        $sql = "SELECT * FROM usuarios WHERE nombre='$nombre'";
         $res = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($res);
-        $nombre = $row["nombre"];
-        $id = $row["id"];
-        $email = $row["email"];
-        $imagen_url = $row["imagen_url"] ?? "./img/people.png";
-        $_SESSION["nombre"] = $nombre;
-        $_SESSION["id"] = $id;
-        $_SESSION["email"] = $email;
-        $_SESSION["imagen"] = $imagen_url;
-        if(!isset($_SESSION["carrito"])){
-            $_SESSION["carrito"] = array();
-        }
     }
     else
     {
         $nombre = "Usuario";
     }
-    $imagen_url = $row["imagen_url"] ?? "./img/people.png";
+    $imagen_url = !empty($row['imagen_url']) ? $row['imagen_url'] : './img/people.png';
+    $_SESSION["imagen"] = $imagen_url;
+    if(!isset($_SESSION["carrito"])){
+        $_SESSION["carrito"] = array();
+    }
+    if(!isset($_SESSION["error"])){
+        $_SESSION["error"] = "";
+    }
 ?>
 <head>
     <meta charset="UTF-8">
@@ -48,19 +43,19 @@
             <a href="index.php"><img width="100px" id="logo" src="img/logo.png" title="Logo"></a>
                 <div class="offcanvas offcanvas-start" tabindex="-1" id="aside" aria-labelledby="aside">
                     <div class="offcanvas-header">
-                        <img id="logo_as" width="100px" src="img/logo.png" title="Logo">
+                        <img id="logo" width="100px" src="img/logo.png" title="Logo">
                         <h5 class="offcanvas-title" id="titulo">C-Weight</h5>
                         <button type="button" class="btn btn-close bg-danger" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
                         <div>
                             <p><a href="index.php">Inicio</a></p>
-                            <p><a href="encargo.php">Encargo</a></p>
+                            <p><a href="index.php">Registro</a></p>
                         </div>
                         <div>Categorías</div>
                         <div class="dropdown mt-3">
-                            <p class="categorias_ofc"><a href="desarrollo.php">Camisetas</a></p>
-                            <p class="categorias_ofc"><a href="desarrollo.php">Pantalones</a></p>
+                            <p class="categorias_ofc"><a href="./camiseta.php">Camisetas</a></p>
+                            <p class="categorias_ofc"><a href="./pantalon.php">Pantalones</a></p>
                             <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Accesorios</button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="desarrollo.php">Mochilas</a></li>
@@ -72,17 +67,19 @@
                 </div>
         </div>
         <form class="d-flex mx-auto form-inline" action="busqueda.php?nombre=<?php if(isset($_POST["prod"])) {echo($_POST["prod"]);} ?>" style="max-width: 400px;">
-            <input id="search" class="form-control mr-sm-2" minlength="3" type="search" placeholder="Search" aria-label="Search" name="nombre">
+            <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="nombre" minlength="3">
             <button class="btn btn-outline-success my-2 my-sm-0 mx-2" type="submit">Search</button>
         </form>
         <div class="d-flex align-items-center flex-sm-row justify-content-center gap-2">
             <p id="nombre" class="float-end"><?= $nombre ?></p>
-            <a href="<?php if(isset($_SESSION["nombre"])){ echo("./usuario.php"); } else{ echo("./inicio_sesion.php"); } ?>"><img id="usr_img" alt="Usuario" width="75px" src="<?php if ($imagen_url != "") { echo($imagen_url); } else { echo("./img/people.png"); } ?>"></a>
+            <a href="<?= isset($_SESSION["nombre"]) ? './usuario.php' : './inicio_sesion.php' ?>">
+                <img id="usr_img" alt="Usuario" width="75px" src="<?= !empty($imagen_url) ? $imagen_url : './img/people.png' ?>">
+            </a>
             <?php if(isset($_SESSION["nombre"])):?>
                 <div class="carrito">
                     <a href="<?php if(isset($_SESSION["carrito"])){ echo("./carrito.php"); } else{ echo("./inicio_sesion.php");}?>"><img src="./img/shopping-cart.png" width="55px" alt="Notificaciones"></a>
-                    <?php if(isset($_SESSION["carrito"]) && count($_SESSION["carrito"]) > 0):?>
-                    <span class="cantidad"><?= count($_SESSION["carrito"]) ?></span>
+                    <?php if(isset($_SESSION["carrito"]) && count($_SESSION["carrito"]) > 0): ?>
+                        <span class="cantidad"><?= count($_SESSION["carrito"]) ?></span>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>

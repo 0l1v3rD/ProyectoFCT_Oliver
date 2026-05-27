@@ -31,9 +31,11 @@
                 if($_GET["emp"] == "*"){
                     $_SESSION["carrito"] = array();
                 }
-                if(is_numeric($_GET["emp"])){
-                    $pos = array_search($_GET["emp"], $_SESSION["carrito"]);
-                    unset($_SESSION["carrito"][$pos]);
+                foreach($_SESSION["carrito"] as $key => $item){
+                    if($item["id"] == $_GET["emp"]){
+                        unset($_SESSION["carrito"][$key]);
+                        break;
+                    }
                 }
             }
             $carrito = array_merge($_SESSION["carrito"]);
@@ -85,16 +87,17 @@
                 <div class="row g-2 p-1 w-100 m-2 justify-content-center">
                     <?php foreach($carrito as $prod):
                         $id = $prod["id"];
-                        $contador += $prod["cantidad"];
+                        $cantidad = $prod["cantidad"];  // ← guardas cantidad antes de sobreescribir
+                        $contador += $cantidad;
                         $sql = "SELECT * FROM productos WHERE id='$id'";
                         $res = mysqli_query($conn, $sql);
-                        $prod = mysqli_fetch_assoc($res);
-                        $precio_total += $prod["precio_unidad"];
+                        $prod = mysqli_fetch_assoc($res);  // ← ahora puedes sobreescribir sin problema
+                        $precio_total += $prod["precio_unidad"] * $cantidad;
                     ?>
                         <div class="col-12 col-md-4 m-0 p-2">
                             <div class="card h-100 m-1">
                                 <div class="card-body p-0 d-flex flex-column text-center align-items-center">
-                                    <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="mb-3"
+                                    <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= !empty($prod["img_url"]) ? $prod["img_url"] : './img/chain.png' ?>" class="mb-3"
                                     title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px" width="250px"></a>
                                     <p class="card-text"><?= $prod["nombre"] ?></p>
                                     <a class="btn btn-danger w-50" href="carrito.php?emp=<?= $prod["id"] ?>">Eliminar</a>

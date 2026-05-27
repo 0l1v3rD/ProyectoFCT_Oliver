@@ -1,26 +1,30 @@
 <?php
     session_start();
+    if(!isset($_SESSION["nombre"])){
+        header("location: ./inicio_sesion.php");
+    }
+    else{
+        $id = $_SESSION["id"];
+    }
     include("../Controller/db.inc");
     include("../Controller/mail/mail.php");
     use PHPMailer\PHPMailer\PHPMailer;
     use PHPMailer\PHPMailer\Exception;
-    $id = $_SESSION["id"];
     if(isset($_GET["upd"])){
-        $nombre = htmlspecialchars($_POST["usr"]) ? htmlspecialchars($_POST["usr"]) : $_SESSION["nombre"];
-        $imagen_url_completa = $_SESSION["imagen"];
-        $email = $_SESSION["email"];
+        $nombre = htmlspecialchars($_POST["usr"]) ?? $_SESSION["nombre"];
+        $email = htmlspecialchars($_POST["email"]) ?? $_SESSION["email"];
         $sql = "SELECT password FROM usuarios WHERE nombre='$nombre' AND email='$email'";
         $res = mysqli_query($conn, $sql);
-        $usuario = mysqli_fetch_row($res);
-        $password = sha1(htmlspecialchars($_POST["password"])) ?? $usuario["password"];
+        $password = sha1(htmlspecialchars($_POST["password"])) ?? $res["password"];
         // Imagen
         $allowedExtensions = ['jpg', 'png'];
         // Check
-        if(isset($_FILES["imagen_url"]) && $_FILES["imagen_url"]["error"] == 0){
+        $imagen_url_completa = NULL;
+        if(isset($_FILES["img_usr"]) && $_FILES["img_usr"]["error"] == 0){
             // Tipos de imagen aceptados
             $allowedExtensions = ['jpg', 'png'];
             // Tipo de imagen
-            $tipo = strtolower(pathinfo($_FILES["imagen_url"]["name"], PATHINFO_EXTENSION));
+            $tipo = strtolower(pathinfo($_FILES["img_usr"]["name"], PATHINFO_EXTENSION));
             // Si tipo esta aceptado
             if(in_array($tipo, $allowedExtensions)){
                 // uniqid genera un numero que si o si es unico y lo pongo como nombre de imagen con su tipo al final
@@ -28,34 +32,27 @@
                 // Donde voy a mandar la imagen junto a la imagen en si
                 $ruta_destino = './img/img_usr/' . $nombre_archivo;
                 // Mueve imagen
-                if(move_uploaded_file($_FILES["imagen_url"]["tmp_name"], $ruta_destino)){
+                if(move_uploaded_file($_FILES["img_usr"]["tmp_name"], $ruta_destino)){
                     // Para que los ficheros en View puedan acceder
                     $imagen_url_completa = "./img/img_usr/" . $nombre_archivo;
                 }
             }
         }
-        $sql = "UPDATE usuarios SET nombre='$nombre', password='$password', imagen_url='$imagen_url_completa' WHERE id='$id'";
+        $imagen = $imagen_url_completa ?? $_SESSION["imagen"];
+        $sql = "UPDATE usuarios SET nombre='$nombre', email='$email', password='$password', imagen_url='$imagen' WHERE id='$id'";
         $res = mysqli_query($conn, $sql);
         if($res){
-            $sql = "UPDATE clientes SET nombre='$nombre', password='$password' WHERE id_usuario=$id";
+            unset($_SESSION["error"]);
+            $sql = "SELECT * FROM usuarios WHERE id='$id'";
             $res = mysqli_query($conn, $sql);
-            if($res){
-                $sql = "SELECT * FROM usuarios WHERE id='$id'";
-                $res = mysqli_query($conn, $sql);
-                $usuario = mysqli_fetch_assoc($res);
-                $_SESSION["nombre"] = $usuario["nombre"];
-                $_SESSION["email"] = $usuario["email"];
-                $_SESSION["id"] = $usuario["id"];
-                $_SESSION["imagen"] = $usuario["imagen_url"];
-                header("Location: ./index.php");
-            }
-            else{
-                $_SESSION["error"] = "Update cli";
-                header("Location: ./usuario.php?id=$id");
-            }
+            $usuario = mysqli_fetch_assoc($res);
+            $_SESSION["nombre"] = $usuario["nombre"];
+            $_SESSION["imagen"] = $usuario["imagen_url"];
+            $_SESSION["id"] = $usuario["id"];
+            header("Location: ./usuario.php");
         }
         else{
-            $_SESSION["error"] = "Update usr";
+            $_SESSION["error"] = "Update";
             header("Location: ./usuario.php?id=$id");
         }
     }
@@ -64,13 +61,11 @@
         $sql = "DELETE FROM pedidos WHERE id=$id_pedido";
         mysqli_query($conn, $sql);
     }
-    if(!isset($_SESSION["nombre"])){
-        header("location: ./inicio_sesion.php");
-    }
     $sql = "SELECT * FROM clientes WHERE id_usuario=$id";
     $res = mysqli_query($conn, $sql);
     $cliente = mysqli_fetch_assoc($res);
-    $sql = "SELECT * FROM pedidos WHERE id_cliente=$id";
+    $id_cliente = $cliente["id"];
+    $sql = "SELECT * FROM pedidos WHERE id_cliente=$id_cliente";
     $res = mysqli_query($conn, $sql);
     if($res){
         $pedidos = mysqli_fetch_all($res, MYSQLI_ASSOC);
@@ -105,20 +100,20 @@
 <body>
     <div id="header"></div>
     <p class="ms-3 mt-2"><a title="Inicio" href="index.php">Inicio</a> > <a title="Usuario" href="usuario.php">Usuario</a></p>
-    <main class="d-flex flex-lg-row flex-column justify-content-center">
-        <div class="d-flex flex-column justify-content-center align-items-center w-100 vw-50">
-            <img id="usr" src="<?php if($_SESSION["imagen"] != ""){ echo($_SESSION["imagen"]); } else{ echo("./img/people.png"); } ?>" width="400px" height="400px">
-            <a href="../Controller/desc.php"><img id="desc" src="./img/8917901.png"></a>
+    <main class="d-flex flex-row justify-content-center">
+        <div class="d-flex flex-column justify-content-center align-items-center w-50">
+            <img id="usr" src="<?= $_SESSION["imagen"] ?? './img/chain.png' ?>" width="400px" height="400px">
+            <a href="./desc.php"><img id="desc" src="./img/8917901.png"></a>
         </div>
-            <div id="d_usr" class="d-flex flex-column d-md-flex align-items-center justify-content-center m-2 p-2 border border-2 w-100 h3">
-                <p id="nombre_usr">Nombre: <?= $_SESSION["nombre"] ?></p>
-                <p id="email">Email: <?= $_SESSION["email"] ?></p>
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    <img src="./img/pencil.png" width="25px">
-                </button>
-            </div>
-            <?php if(count($pedidos) > 0): ?>
-            <div class="p-2 vw-100">
+        <div class="d-flex flex-column d-none d-lg-flex align-items-center justify-content-center border border-2 w-50 h3">
+            <p id="nombre_usr">Nombre: <?= $_SESSION["nombre"] ?></p>
+            <p id="email">Email: <?= $_SESSION["email"] ?></p>
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <img src="./img/pencil.png" width="25px">
+            </button>
+        </div>
+        <?php if(count($pedidos) > 0): ?>
+            <div class="d-flex flex-column d-none d-lg-flex align-items-center justify-content-center border border-2 w-50 h3">
                 <h2>Pedidos:</h2>
                 <div class="m-2">
                     <?php $contador = 1;
@@ -128,111 +123,111 @@
                         $fecha_final = strtotime($pedido["fecha_final"]);
                         $fecha_final = date("d-m-Y", $fecha_final);
                     ?>
-                        <div class="border border-1 p-2">
-                        <h2>Pedido <?= $contador ?></h2>
-                            <p><?= "Fecha de inicio: " . $fecha_inicio ?></p>
-                            <p><?= "Fecha aproximada de entrega: " . $fecha_final ?></p>
-                            <p><?= "Estado del pedido: " . $pedido["estado"] ?></p>
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#<?= $pedido["id"] ?>">
-                                Detalles
-                            </button>
-                            <!-- Modal -->
-                            <div class="modal fade" id="<?= $pedido["id"] ?>" data-bs-keyboard="false" tabindex="-1" aria-labelledby="<?= $pedido["id"] ?>" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
+                    <div class="border border-1 p-2">
+                    <h2>Pedido <?= $contador ?></h2>
+                        <p><?= "Fecha de inicio: " . $fecha_inicio ?></p>
+                        <p><?= "Fecha aproximada de entrega: " . $fecha_final ?></p>
+                        <p><?= "Estado del pedido: " . $pedido["estado"] ?></p>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#<?= $pedido["id"] ?>">
+                            Detalles
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="<?= $pedido["id"] ?>" data-bs-keyboard="false" tabindex="-1" aria-labelledby="<?= $pedido["id"] ?>" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title h2" id="modal">Pedido <?= $contador ?></h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h3>Id del pedido: <?= $pedido["id"] ?></h3>
+                                    <?php
+                                        $id_pedido = $pedido["id"];
+                                        $sql = "SELECT * FROM pedido_detalles WHERE id_pedido=$id_pedido";
+                                        $res = mysqli_query($conn, $sql);
+                                        if($res):
+                                            $pedido_detalles = mysqli_fetch_all($res, MYSQLI_ASSOC);
+                                            $contador_detalles = 1;
+                                            foreach($pedido_detalles as $pedido_detalle):
+                                            
+                                        ?>
+                                        <div class="d-flex flex-column">
+                                            
+                                            <?php
+                                                $id_producto = $pedido_detalle["id_producto"];
+                                                $sql = "SELECT nombre FROM productos WHERE id=$id_producto";
+                                                $res = mysqli_query($conn, $sql);
+                                                if($res){
+                                                    $res = mysqli_fetch_row($res);
+                                                    $nombre_producto = $res[0];
+                                                }
+                                                ?>
+                                            <h5>Nombre del producto: <?= $nombre_producto ?></h5>
+                                            <h5>Cantidad: <?=  $pedido_detalle["cantidad"]  ?></h5>
+                                            <h5>Precio total: <?= $pedido_detalle["precio_total"] ?>&euro;</h5>
+                                            <?php if($contador_detalles < count($pedido_detalles)): ?>
+                                            <hr>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php
+                                            $contador_detalles++;
+                                            endforeach;
+                                        endif;
+                                        ?>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#<?= $pedido["id"] ?>_del">Cancelar</button>
+                        <div class="modal fade" id="<?= $pedido["id"] ?>_del" data-bs-keyboard="false" tabindex="-1" aria-labelledby="<?= $pedido["id"] ?>_del" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
                                     <div class="modal-header">
-                                        <h1 class="modal-title h2" id="modal">Pedido <?= $contador ?></h1>
+                                        <h3 class="modal-title" id="staticBackdropLabel">Confirmación</h3>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <h3>Id del pedido: <?= $pedido["id"] ?></h3>
-                                        <?php
-                                            $id_pedido = $pedido["id"];
-                                            $sql = "SELECT * FROM pedido_detalles WHERE id_pedido=$id_pedido";
-                                            $res = mysqli_query($conn, $sql);
-                                            if($res):
-                                                $pedido_detalles = mysqli_fetch_all($res, MYSQLI_ASSOC);
-                                                $contador_detalles = 1;
-                                                foreach($pedido_detalles as $pedido_detalle):
-                                                
-                                            ?>
-                                            <div class="d-flex flex-column">
-                                                
-                                                <?php
-                                                    $id_producto = $pedido_detalle["id_producto"];
-                                                    $sql = "SELECT nombre FROM productos WHERE id=$id_producto";
-                                                    $res = mysqli_query($conn, $sql);
-                                                    if($res){
-                                                        $res = mysqli_fetch_row($res);
-                                                        $nombre_producto = $res[0];
-                                                    }
-                                                    ?>
-                                                <h5>Nombre del producto: <?= $nombre_producto ?></h5>
-                                                <h5>Cantidad: <?=  $pedido_detalle["cantidad"]  ?></h5>
-                                                <h5>Precio total: <?= $pedido_detalle["precio_total"] ?>&euro;</h5>
-                                                <?php if($contador_detalles < count($pedido_detalles)): ?>
-                                                <hr>
-                                                <?php endif; ?>
-                                            </div>
-                                            <?php
-                                                $contador_detalles++;
-                                                endforeach;
-                                            endif;
-                                            ?>
+                                        <h4>Estás seguro de eliminar este pedido?</h4>
                                     </div>
                                     <div class="modal-footer">
+                                        <a href="usuario.php?del=<?= $pedido["id"] ?>" class="btn btn-danger">Eliminar</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#<?= $pedido["id"] ?>_del">Cancelar</button>
-                            <div class="modal fade" id="<?= $pedido["id"] ?>_del" data-bs-keyboard="false" tabindex="-1" aria-labelledby="<?= $pedido["id"] ?>_del" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h3 class="modal-title" id="staticBackdropLabel">Confirmación</h3>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <h4>Estás seguro de eliminar este pedido?</h4>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a href="usuario.php?del=<?= $pedido["id"] ?>" class="btn btn-danger">Eliminar</a>
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    <?php
-                        $contador++;
-                        endforeach;
-                    ?>
-                </div>
+                    </div>
+                <?php
+                    $contador++;
+                    endforeach;
+                endif;
+                ?>
             </div>
-            <?php endif; ?>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-dialog">
+                <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Editar usuario</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="usuario.php?id=<?= $_SESSION["id"] ?>&upd=1" enctype="multipart/form-data" method="post">
+                    <form action="usuario.php?id=<?= $_SESSION["id"] ?>&upd=1" method="post" enctype="multipart/form-data">
                         <label class="form-label">Usuario</label>
                         <input type="text" name="usr" class="form-control">
+                        <label class="form-label">Email</label>
+                        <input type="text" name="email" class="form-control">
                         <label class="form-label">Contraseña</label>
-                        <input type="password" name="password" autocomplete="off" class="form-control">
-                        <br>
-                        <input id="imagen_url" class="form-control" type="file" accept=".jpg, .png" label="img_usr" name="imagen_url">
-                        <br>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
+                        <input type="password" name="password" class="form-control">
+                        <label for="img_usr">Imagen:</label>
+                        <input id="img_usr" class="form-control" type="file" accept=".jpg, .png" label="img_usr" name="img_usr">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                     </form>
                 </div>
                 </div>

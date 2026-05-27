@@ -57,11 +57,8 @@
                 $sql = "INSERT into usuarios(nombre, email, password, imagen_url) VALUES('$nombre', '$email', '$password', '$imagen_url_completa')";
                 $res = mysqli_query($conn, $sql);
                 if(mysqli_affected_rows($conn) > 0){
-                    $sql = "SELECT * FROM usuarios WHERE email='$email'";
-                    $res = mysqli_query($conn, $sql);
-                    #Inserto cliente
-                    $cliente = mysqli_fetch_assoc($res);
-                    $id = $cliente["id"];
+                    $id = mysqli_insert_id($conn);
+                     #Inserto cliente
                     $sql = "INSERT into clientes(id_usuario, nombre, apellidos, email, genero, direccion, codpostal, poblacion, provincia, password) VALUES($id, '$nombre', '$apellidos', '$email', '$genero', '$direccion', '$postal', '$poblacion', '$provincia', '$password')";
                     mysqli_query($conn, $sql);
                     if(mysqli_affected_rows($conn) > 0){

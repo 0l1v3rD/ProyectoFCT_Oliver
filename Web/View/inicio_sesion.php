@@ -1,6 +1,6 @@
 <?php
     session_start();
-    if(isset($_SESSION["email"])){
+    if(isset($_SESSION["nombre"])){
         header("location: ./index.php");
     }
     include("../Controller/db.inc");
@@ -13,6 +13,7 @@
         $sql = "SELECT * FROM usuarios WHERE email='$email' AND password='$password'";
         $res = mysqli_query($conn, $sql);
         if(mysqli_num_rows($res) > 0){
+            unset($_SESSION["error"]);
             $usuario = mysqli_fetch_assoc($res);
             $_SESSION["nombre"] = $usuario["nombre"];
             $_SESSION["email"] = $usuario["email"];
@@ -22,7 +23,7 @@
         }
         else{
             $_SESSION["error"] = "Login";
-            header("Location: ./inicio_sesion.php?email=$email");
+            header("Location: ./inicio_sesion.php");
         }
     }
 ?>
@@ -70,6 +71,7 @@
                 <button type="submit" id="inicio" class="btn btn-warning form-control">Iniciar sesión</button>
             </form>
             <p>No tienes cuenta? <a href="./registro.php" id="registro_pagina" class="text-warning">Registrate</a></p>
+            <p>Has olvidado la contraseña? <a href="./rec_passwd.php" id="registro_pagina" class="text-warning">Recuperar contraseña</a></p>
         </div>
         <div class="d-flex d-none d-lg-flex align-items-center justify-content-center w-50">
             <img alt="Persona levantando peso" width="500px" height="500px" src="img/barbell-black-and-white-black-and-white-791763.jpg">

@@ -75,8 +75,8 @@
                                     <div class="col-md-4">
                                         <div class="card h-100">
                                             <div class="card-body d-flex flex-column text-center">
-                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
-                                                title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
+                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= !empty($prod["img_url"]) ? $prod["img_url"] : './img/chain.png' ?>" class="img-fluid mb-3"
+                                                title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250"></a>
                                                 <p class="card-text"><?= $prod["nombre"] ?></p>
                                                 <a href="carrito.php?id=<?= $prod["id"] ?>&cantidad=1" class="btn btn-primary mt-auto">Añadir al carrito</a>
                                             </div>
@@ -122,15 +122,13 @@
                             <div class="container">
                                 <!-- Conjunto productos-->
                                 <div class="row justify-content-center g-3">
-                                <?php
-                                    $contador = 0;
-                                    foreach ($pantalones as $prod):
+                                <?php foreach ($pantalones as $prod):
                                     $contador++; ?>
                                     <!-- Carta para todos los productos de la fila en la que esta el bucle -->
                                     <div class="col-md-4">
                                         <div class="card h-100">
                                             <div class="card-body d-flex flex-column text-center">
-                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?php if($prod["img_url"] != ""){ echo($prod["img_url"]); } else{ echo("./img/broken-image.png"); } ?>" class="img-fluid mb-3"
+                                                <a href="producto.php?id=<?= $prod["id"] ?>"><img src="<?= !empty($prod["img_url"]) ? $prod["img_url"] : './img/chain.png' ?>" class="img-fluid mb-3"
                                                 title="<?= $prod["nombre"] ?>" alt="<?= $prod["nombre"] ?>" height="250px"></a>
                                                 <p class="card-text"><?= $prod["nombre"] ?></p>
                                                 <a href="carrito.php?id=<?= $prod["id"] ?>&cantidad=1" class="btn btn-primary mt-auto">Añadir al carrito</a>

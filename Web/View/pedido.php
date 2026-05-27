@@ -20,22 +20,30 @@
         $_SESSION["error"] = "Usuario";
         header("Location: carrito.php");
     }
+    $id_usuario = $_SESSION["id"];
+    $fecha_hoy = date_create();
+    $fecha_formato = date("Y-m-d", strtotime('+40 days'));
+    $fecha_hoy = $fecha_hoy->format('Y-m-d');
     if(isset($_SESSION["carrito"]) && count($_SESSION["carrito"]) > 0){
-        $fecha_hoy = date_create();
-        $fecha_formato = date("Y-m-d", strtotime('+40 days'));
-        $fecha_hoy = $fecha_hoy->format('Y-m-d');
         $carrito = $_SESSION["carrito"];
-        $id_usuario = $_SESSION["id"];
         $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
         if(mysqli_query($conn, $sql)){
             $res = mysqli_query($conn, $sql);
             $pedido = mysqli_fetch_assoc($res);
-            $id_pedido = $pedido["id"] + 1;
         }
-        else{
-            $id_pedido = 1;
+        // Obtener id_cliente
+        $sql = "SELECT id FROM clientes WHERE id_usuario = $id_usuario";
+        $res = mysqli_query($conn, $sql);
+        $cliente = mysqli_fetch_assoc($res);
+
+        if(!$cliente){
+            $_SESSION["error"] = "Pedido";
+            header("Location: carrito.php");
+            die();
         }
-        $sql = "INSERT into pedidos(id, id_cliente, fecha_inicio, fecha_final, estado) VALUES($id_pedido, $id_usuario, '$fecha_hoy', '$fecha_formato', 'Pendiente')";
+
+        $id_cliente = $cliente["id"];
+        $sql = "INSERT into pedidos(id_cliente, fecha_inicio, fecha_final, estado) VALUES($id_cliente, '$fecha_hoy', '$fecha_formato', 'Pendiente')";
         $res = mysqli_query($conn, $sql);
             if($res){
                 $sql = "SELECT id FROM pedidos WHERE id = (SELECT MAX(id) FROM pedidos)";
@@ -91,7 +99,33 @@
             }
         }
         else{
-            header("Location: index.php");
+            if(isset($_GET["id"])){
+                $id_producto = $_GET["id"];
+                $sql = "SELECT * FROM productos WHERE id='$id_producto'";
+                $res = mysqli_query($conn, $sql);
+                if(mysqli_num_rows($res) > 0){
+                    $producto = mysqli_fetch_assoc($res);
+                    $precio = $producto["precio_unidad"];
+                    if(isset($_SESSION["id"])){
+                        $id_cliente = $_SESSION["id"];
+                    }
+                    $fecha_hoy = date_create();
+                    $fecha_esp = date_add($fecha_hoy, date_interval_create_from_date_string("40 days"));
+                    if(isset($_GET["ins"]) && isset($_GET["id"]) && isset($_GET["cantidad"])){
+                        $_SESSION["carrito"][] = [
+                            "id"=> $_GET["id"],
+                            "cantidad"=> $_GET["cantidad"]
+                        ];
+                    }
+                    if(!isset($_SESSION["carrito"])){
+                        $_SESSION["carrito"] = array();
+                    }
+                    
+                }
+            }
+            else{
+                header("Location: index.php");
+            }
         }
 ?>
 <!DOCTYPE html>
