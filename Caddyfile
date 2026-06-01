@@ -1,6 +1,4 @@
 :80 {
 	root * /app/Web/View
-	encode gzip
-	php
-	file_server
+	respond "Hello from Caddy" 200
 }
