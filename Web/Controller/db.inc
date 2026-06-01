@@ -1,5 +1,5 @@
 <?php
-    $host = "localhost";  // Servidor
+    $host = getenv('MYSQLHOST');  // Servidor
     $nombreBD = "c-weight";  // Base de datos
     $usuario = "root";  // Usuario
     $password = ""; // Contraseña
