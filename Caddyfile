@@ -2,5 +2,4 @@
 	root * /app/Web/View
 	try_files {path} {path}/ /index.php?{query}
 	php_fastcgi localhost:9000
-	file_server
 }
