@@ -1,6 +1,0 @@
-{
-  "php": {
-    "webServer": "caddy",
-    "caddyfile": "Caddyfile"
-  }
-}
