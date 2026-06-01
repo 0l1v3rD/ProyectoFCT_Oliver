@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . /app
 
-RUN rm /etc/caddy/Caddyfile
-
 COPY Caddyfile /etc/caddy/Caddyfile
 
 EXPOSE 80
+
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
