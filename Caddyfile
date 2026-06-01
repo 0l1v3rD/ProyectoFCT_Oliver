@@ -1,5 +1,4 @@
 :80 {
 	root * /app/Web/View
-	rewrite * /index.php
-	php_fastcgi localhost:9000
+	php
 }
