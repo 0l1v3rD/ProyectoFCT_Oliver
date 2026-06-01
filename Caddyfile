@@ -1,6 +1,6 @@
 :80 {
 	root * /app/Web/View
-	php_fastcgi localhost:9000
 	try_files {path} {path}/ /index.php?{query}
+	php_fastcgi localhost:9000
 	file_server
 }
