@@ -6,6 +6,10 @@ COPY . /app
 
 COPY Caddyfile /etc/caddy/Caddyfile
 
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 80
 
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
+ENTRYPOINT ["/entrypoint.sh"]
