@@ -1,4 +1,4 @@
 :80 {
 	root * /app/Web/View
-	respond "Hello from Caddy" 200
+	file_server
 }
