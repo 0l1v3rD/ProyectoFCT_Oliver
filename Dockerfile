@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . /app
 
-COPY Caddyfile /Caddyfile
+RUN rm /etc/caddy/Caddyfile
+
+COPY Caddyfile /etc/caddy/Caddyfile
 
 EXPOSE 80
